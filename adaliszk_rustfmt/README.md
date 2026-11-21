@@ -1,16 +1,11 @@
-A drop-in `rustfmt` shim that bundles a personal style and initializes nightly requirements.
-No per-project `rustfmt.toml` is required and applies the common style of:
+A drop-in `rustfmt` shim that bundles a personal style and initializes nightly requirements
+using `rustup`. No per-project `rustfmt.toml` is required and applies the common style of:
 
 ```toml
 edition = "2024"
-brace_style = "AlwaysNextLine"  # Spacing between signature and body
+brace_style = "AlwaysNextLine"  # Spacing between signature & body
 max_width = 96 # <- Preference with multiple side-by-side panels
 ```
-
-## Prerequisites
-
-- RustUp: which the shim uses to provision and select the nightly `rustfmt`.
-- Network Access: on first run `rustup` downloads the nightly toolchain.
 
 ## Installation & Usage
 
@@ -24,10 +19,10 @@ adaliszkfmt init
 - Installs the nightly `rustfmt` component through `rustup`
 - Registers `adaliszkfmt` as the `RUSTFMT` binary for shell
 
-> Restart your shell after `init` so the environment variable takes effect!
+> Restart your shell after `init` for applying the changes!
 
 The **init** automation currently targets Windows. On other platforms, set `RUSTFMT` to the
-installed binary path in your shell profile manually until 0.2.x.
+installed binary path in your shell profile manually until `0.2.x`.
 
 ## Why do this?
 

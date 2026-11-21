@@ -1,8 +1,8 @@
 [workspace]
 resolver = "3"
 members = [
-    "adaliszk_rustfmt",
-#  "adaliszk_foundation",
+    "adaliszkfmt",
+  "adaliszk_foundation",
 #  "adaliszk_console",
 #  "adalsizk_console/macros",
 #  "adaliszk_commands",

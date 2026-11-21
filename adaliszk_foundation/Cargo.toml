@@ -1,0 +1,14 @@
+[package]
+name = "adaliszk_foundation"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+# description = "Drop-in rustfmt shim that bundles a personal style with nightly provisioning."
+# keywords = ["rustfmt", "formatting", "custom-configuration", "opinionated"]
+# categories = ["development-tools", "command-line-utilities"]
+# repository = "https://github.com/adaliszk/rust-toolbox"
+# readme = "README.md"
+
+[lib]
+path = "source/lib.rs"

@@ -1,26 +1,22 @@
-# adaliszkfmt
+> A drop-in `rustfmt` shim that bundles a personal style and initializes nightly requirements.
 
-> A drop-in `rustfmt` shim that bundles a personal style and provisions nightly automatically.
+Wraps **rustfmt** and injects a bundled configuration on execution, with initialization also
+dispatches to the nightly toolchain through **rustup**.
 
-`adaliszkfmt` wraps `rustfmt`. It injects a bundled configuration and dispatches to the nightly
-toolchain through `rustup`. You install it once, run `adaliszkfmt init`, and every `cargo fmt`
-uses your style across all projects. No per-project `rustfmt.toml` is required.
+No per-project `rustfmt.toml` is required and applies the common style of:
 
-## Why
-
-The same formatting style tends to repeat across projects. A shared `rustfmt.toml` has no import
-or inheritance mechanism, so the file gets copied and drifts. `adaliszkfmt` embeds the style in
-the binary instead. One installation carries the style everywhere, and nightly-only options stay
-available because the shim always targets the nightly `rustfmt`.
-
-This is purely a tool for my own projects, but anyone is welcome to use it!
+```toml
+edition = "2024"
+brace_style = "AlwaysNextLine"  # <- Adds spacing between signature and body for easier reading
+max_width = 96 # <- Preference for my own flow where I have mutliple vertical panels
+```
 
 ## Requirements
 
-- `rustup`, which the shim uses to provision and select the nightly `rustfmt`.
-- Network access on first run, so `rustup` can download the nightly toolchain.
+- RustUp: which the shim uses to provision and select the nightly `rustfmt`.
+- Network access: on first run `rustup` needs to download the nightly toolchain.
 
-The `init` automation currently targets Windows. On other platforms, set `RUSTFMT` to the
+The **init** automation currently targets Windows. On other platforms, set `RUSTFMT` to the
 installed binary path in your shell profile manually.
 
 ## Install
@@ -37,14 +33,14 @@ adaliszkfmt init
 
 Restart your shell after `init` so the environment variable takes effect.
 
-## Usage
+## Why do this?
 
-Run `cargo fmt` as usual. Cargo reads the `RUSTFMT` variable and calls `adaliszkfmt`, which
-formats with the bundled style.
+The same formatting style tends to repeat across projects. A shared **rustfmt.toml** has no
+import or inheritance mechanism, so the file gets copied and drifts. A custom ship instead
+embeds the style in the binary instead. One installation carries the style everywhere, and
+nightly-only options stay available with the expected initialization.
 
-```sh
-cargo fmt
-```
+This is purely a tool for my own projects, but anyone is welcome to use it!
 
 ### JetBrains RustRover
 

@@ -1,0 +1,14 @@
+# Systems and Editors
+.idea
+.vscode
+**/.DS_Store
+**/*.iml
+
+# Project
+.storage
+.upstream
+**/temp
+target
+
+# Exceptions
+!**/.gitkeep

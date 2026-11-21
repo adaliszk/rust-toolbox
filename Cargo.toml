@@ -1,0 +1,29 @@
+[workspace]
+resolver = "3"
+members = [
+    "adaliszk_rustfmt",
+#  "adaliszk_foundation",
+#  "adaliszk_console",
+#  "adalsizk_console/macros",
+#  "adaliszk_commands",
+#  "adaliszk_commands/macros",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+rust-version = "1.100"
+
+[workspace.dependencies]
+#async-trait = { version = "0.1" }
+#clap = { version = "4.6", features = ["derive", "env"] }
+#foundation = { path = "./adaliszk_foundation" }
+#futures = { version = "0.3" }
+#inventory = { version = "0.3" }
+#serde = { version = "1.0", features = ["derive"] }
+#serde_norway = { version = "0.9" }
+#strum = { version = "0.28", features = ["derive"] }
+#thiserror = { version = "2.0" }
+#tokio = { version = "1.54", features = ["full"] }
+#tracing = { version = "0.1" }

@@ -10,6 +10,13 @@ members = [
     # "adaliszk_commands/macros",
 ]
 
+[workspace.metadata.release]
+shared-version = true
+tag-name = "v{{version}}"
+pre-release-commit-message = "chore: release v{{version}}"
+publish = true # FUTURE: turn into `false` when automation introduced
+push = true
+
 [workspace.package]
 version = "0.1.0"
 edition = "2024"

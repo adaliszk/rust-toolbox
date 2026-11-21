@@ -34,8 +34,8 @@
               extensions = [
                 "rust-src"
                 "rust-analyzer"
-                "clippy"
                 "rustfmt"
+                "clippy"
               ];
             };
       in
@@ -46,9 +46,10 @@
           ]
           ++ (with pkgs; [
             pkg-config
-            cargo-watch
-            cargo-nextest
             cargo-deny
+            cargo-nextest
+            cargo-watch
+            cargo-release
           ]);
           buildInputs = with pkgs; [
             openssl

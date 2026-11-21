@@ -1,0 +1,23 @@
+[package]
+name = "adaliszk-prelude"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Shared configuration types, YAML config parsing, and an opinionated tracing setup."
+keywords = ["config", "tracing", "logging", "prelude", "foundation"]
+categories = ["config", "development-tools"]
+repository = "https://codeberg.org/adaliszk/rust-toolbox"
+readme = "README.md"
+
+[lib]
+path = "source/lib.rs"
+
+[dependencies]
+adaliszk-prelude-macros = { path = "./macros" }
+serde.workspace = true
+serde_norway.workspace = true
+strum.workspace = true
+thiserror.workspace = true
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json"] }
+tracing-appender = { version = "0.2" }

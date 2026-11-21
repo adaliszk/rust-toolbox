@@ -2,7 +2,8 @@
 resolver = "3"
 members = [
     "adaliszkfmt",
-    "adaliszk_foundation",
+    "adaliszk-prelude/macros",
+    "adaliszk-prelude",
     # "adaliszk_console",
     # "adalsizk_console/macros",
     # "adaliszk_commands",
@@ -21,9 +22,9 @@ rust-version = "1.100"
 #foundation = { path = "./adaliszk_foundation" }
 #futures = { version = "0.3" }
 #inventory = { version = "0.3" }
-#serde = { version = "1.0", features = ["derive"] }
-#serde_norway = { version = "0.9" }
-#strum = { version = "0.28", features = ["derive"] }
-#thiserror = { version = "2.0" }
+serde = { version = "1.0", features = ["derive"] }
+serde_norway = { version = "0.9" }
+strum = { version = "0.28", features = ["derive"] }
+thiserror = { version = "2.0" }
 #tokio = { version = "1.54", features = ["full"] }
 #tracing = { version = "0.1" }

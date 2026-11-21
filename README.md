@@ -18,15 +18,39 @@ a decade now. Nothing crazy, 99% the official with a tiny tweak here and there.
 
 ## Packages (Crates)
 
-| Name                  | Type    | Purpose                                                                     | Crate                                                                                                                    |
-|:----------------------|:--------|:----------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------|
-| `adaliszkfmt`         | CLI     | Drop-in `rustfmt` shim bundling a personal style with nightly provisioning. | [![v](https://img.shields.io/crates/v/adaliszkfmt?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszkfmt) |
-| `adaliszk-foundation` | Library | _Provides common types and utilities for projects and configuration_        | —                                                                                                                        |
-| `adaliszk-console`    | Library | _Wrapper for Clap-based CLI applications_                                   | —                                                                                                                        |
-| `adaliszk-commands`   | Library | _Wrapper for Command-builder for platforms such as GitHub and Discord_      | —                                                                                                                        |
-| `adlaiszk-terminal`   | Library | _Wrapper for Rattatui-based CLI applications_                               | —                                                                                                                        |
-| `adlaiszk-events`     | Library | _Wrapper for Tokoi-based Events and Listeners inside applications_          | —                                                                                                                        |
-| `adaliszk-queues`     | Library | _wrapper for background queues with workflows inside applications_          | —                                                                                                                        |
+| Name                                               | Type    | Purpose                                          | Crate                                                                                                                            |
+|:---------------------------------------------------|:--------|:-------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------|
+| [`adaliszkfmt`](./adaliszkfmt/README.md)           | CLI     | Drop-in `rustfmt` shim bundling a personal style | [![v](https://img.shields.io/crates/v/adaliszkfmt?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszkfmt)         |
+| [`adaliszk-prelude`](./adaliszk-prelude/README.md) | Library | Configure, Log, and Monitor applications         | [![v](https://img.shields.io/crates/v/adalszk-prelude?logo=&label=&style=flat-square)](https://crates.io/crates/adalszk-prelude) |
+| `adaliszk-console`                                 | Library | _Inventory for Clap-based CLI applications_      | —                                                                                                                                |
+| `adaliszk-commands`                                | Library | _Inventory for Command-builder for integrations_ | —                                                                                                                                |
+| `adlaiszk-terminal`                                | Library | _Inventory for Rattatui-based CLI applications_  | —                                                                                                                                |
+| `adlaiszk-events`                                  | Library | _Inventory for Tokoi-based eventing_             | —                                                                                                                                |
+
+### Design & Concept
+
+All applications need a configuration parsing, logging, and monitoring, which could be set up
+by using the `adaliszk-prelude`:
+
+```rust
+use adaliszk_prelude::{LoggingConfig, parse_config, init_tracing};
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+struct ApplicationConfig {
+    logging: LoggingConfig,
+}
+
+// Parse the config using TOML, into a serde/strum dict:
+let config = parse_config::<ApplicationConfig>(path);
+
+// Initialize the tracing using the config:
+init_tracing(config.logging);
+```
+
+From there, the particular application is expected to be split into multiple local crates, where
+[inventory](https://crates.io/crates/inventory) is used under the hood to distribute plugins
+that has been declared by the various use-case libraries.
 
 ## License & Disclosure
 

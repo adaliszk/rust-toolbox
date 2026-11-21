@@ -20,7 +20,7 @@ cargo add adaliszk-prelude
 Parse a config file into a typed struct, then initialize logging from it:
 
 ```rust
-use adaliszk_prelude::{LoggingConfig, parse_config, init_tracing};
+use adaliszk_prelude::{LoggingConfig, parse_config, init_tracing, workspace_crates};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -30,7 +30,7 @@ struct AppConfig {
 }
 
 let config: AppConfig = parse_config("config.yaml".as_ref())?;
-let guard = init_tracing(&config.logging)?;
+let guard = init_tracing(workspace_crates!(), &config.logging)?;
 ```
 
 ## License & Disclosure

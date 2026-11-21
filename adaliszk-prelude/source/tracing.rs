@@ -15,7 +15,7 @@ pub enum TracingError
     Initialization(#[from] tracing_subscriber::util::TryInitError),
 }
 
-pub fn init_tracing(config: &LoggingConfig) -> Result<WorkerGuard, TracingError>
+pub fn init_tracing(namespaces: Vec<String>, config: &LoggingConfig) -> Result<WorkerGuard, TracingError>
 {
     #[cfg(not(debug_assertions))]
     const FILTER_LEVEL: LogLevel = config.logging.level;
@@ -23,7 +23,6 @@ pub fn init_tracing(config: &LoggingConfig) -> Result<WorkerGuard, TracingError>
     const FILTER_LEVEL: LogLevel = LogLevel::Debug;
 
     let mut filters: Vec<String> = vec![FILTER_LEVEL.to_string()];
-    let namespaces = workspace_crates!();
     for package in namespaces {
         filters.push(format!("{package}={FILTER_LEVEL}"))
     }

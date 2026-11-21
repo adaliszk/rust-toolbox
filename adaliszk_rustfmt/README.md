@@ -1,25 +1,18 @@
-> A drop-in `rustfmt` shim that bundles a personal style and initializes nightly requirements.
-
-Wraps **rustfmt** and injects a bundled configuration on execution, with initialization also
-dispatches to the nightly toolchain through **rustup**.
-
+A drop-in `rustfmt` shim that bundles a personal style and initializes nightly requirements.
 No per-project `rustfmt.toml` is required and applies the common style of:
 
 ```toml
 edition = "2024"
-brace_style = "AlwaysNextLine"  # <- Adds spacing between signature and body for easier reading
-max_width = 96 # <- Preference for my own flow where I have mutliple vertical panels
+brace_style = "AlwaysNextLine"  # Spacing between signature and body
+max_width = 96 # <- Preference with multiple side-by-side panels
 ```
 
-## Requirements
+## Prerequisites
 
 - RustUp: which the shim uses to provision and select the nightly `rustfmt`.
-- Network access: on first run `rustup` needs to download the nightly toolchain.
+- Network Access: on first run `rustup` downloads the nightly toolchain.
 
-The **init** automation currently targets Windows. On other platforms, set `RUSTFMT` to the
-installed binary path in your shell profile manually.
-
-## Install
+## Installation & Usage
 
 ```sh
 cargo install adaliszkfmt
@@ -28,10 +21,13 @@ adaliszkfmt init
 
 `init` performs the global setup:
 
-- Installs the nightly toolchain with the `rustfmt` component through `rustup`.
-- Registers `adaliszkfmt` as the `RUSTFMT` binary for future shell sessions.
+- Installs the nightly `rustfmt` component through `rustup`
+- Registers `adaliszkfmt` as the `RUSTFMT` binary for shell
 
-Restart your shell after `init` so the environment variable takes effect.
+> Restart your shell after `init` so the environment variable takes effect!
+
+The **init** automation currently targets Windows. On other platforms, set `RUSTFMT` to the
+installed binary path in your shell profile manually until 0.2.x.
 
 ## Why do this?
 

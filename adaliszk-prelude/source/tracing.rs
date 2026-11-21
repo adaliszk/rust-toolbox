@@ -23,7 +23,8 @@ pub fn init_tracing(config: &LoggingConfig) -> Result<WorkerGuard, TracingError>
     const FILTER_LEVEL: LogLevel = LogLevel::Debug;
 
     let mut filters: Vec<String> = vec![FILTER_LEVEL.to_string()];
-    for package in workspace_crates!() {
+    let namespaces = workspace_crates!();
+    for package in namespaces {
         filters.push(format!("{package}={FILTER_LEVEL}"))
     }
 

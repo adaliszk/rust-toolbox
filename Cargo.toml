@@ -18,7 +18,7 @@ publish = true # FUTURE: turn into `false` when automation introduced
 push = true
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 license = "MPL-2.0"
 rust-version = "1.100"

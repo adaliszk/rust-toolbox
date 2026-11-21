@@ -5,12 +5,24 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use strum::{AsRefStr, Display, IntoStaticStr};
 
-#[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct LoggingConfig
 {
     pub level: LogLevel,
     pub format: LogFormat,
     pub dir: PathBuf,
+}
+
+impl Default for LoggingConfig
+{
+    fn default() -> Self
+    {
+        Self {
+            level: LogLevel::default(),
+            format: LogFormat::default(),
+            dir: PathBuf::from("/var/lib/application/logs"),
+        }
+    }
 }
 
 #[derive(

@@ -29,23 +29,25 @@ a decade now. Nothing crazy, 99% the official with a tiny tweak here and there.
 
 ### Design & Concept
 
-All applications need a configuration parsing, logging, and monitoring, which could be set up
+All applications need a configuration, logging, and monitoring, which could be set up
 by using the `adaliszk-prelude`:
 
 ```rust
-use adaliszk_prelude::{LoggingConfig, parse_config, init_tracing};
+use adaliszk_prelude::config::{LoggingConfig, parse_config};
+use adaliszk_prelude::tracing::{workspace_crates, init_tracing};
 use serde::Deserialize;
 
 #[derive(Deserialize)]
 struct ApplicationConfig {
+    timezone: String,
     logging: LoggingConfig,
 }
 
 // Parse the config using TOML, into a serde/strum dict:
-let config = parse_config::<ApplicationConfig>(path);
+let config: ApplicationConfig = parse_config("config.yaml".as_ref());
 
 // Initialize the tracing using the config:
-init_tracing(config.logging);
+let guard = init_tracing(workspace_crates!(), &config.logging);
 ```
 
 From there, the particular application is expected to be split into multiple local crates, where

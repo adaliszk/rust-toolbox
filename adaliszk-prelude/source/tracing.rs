@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use tracing_appender::non_blocking::WorkerGuard;
-use crate::workspace_crates;
-use crate::{LogLevel, LoggingConfig};
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
+
+pub use crate::types::{LogLevel, LoggingConfig};
+pub use adaliszk_prelude_macros::workspace_crates;
 
 #[derive(Debug, thiserror::Error)]
 pub enum TracingError
@@ -15,7 +16,10 @@ pub enum TracingError
     Initialization(#[from] tracing_subscriber::util::TryInitError),
 }
 
-pub fn init_tracing(namespaces: Vec<String>, config: &LoggingConfig) -> Result<WorkerGuard, TracingError>
+pub fn init_tracing(
+    namespaces: Vec<String>,
+    config: &LoggingConfig,
+) -> Result<WorkerGuard, TracingError>
 {
     #[cfg(not(debug_assertions))]
     const FILTER_LEVEL: LogLevel = config.logging.level;

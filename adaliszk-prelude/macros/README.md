@@ -1,7 +1,3 @@
-The procedural-macro companion crate for [
-`adaliszk-prelude`](https://crates.io/crates/adaliszk-prelude).
-It exists as a separate crate only because a `proc-macro` requirements.
-
 > [!WARNING]
 > Depend on [`adaliszk-prelude`](https://crates.io/crates/adaliszk-prelude) instead. The prelude
 > re-exports every macro from here, so you never name this crate directly.

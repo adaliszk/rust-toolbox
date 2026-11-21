@@ -1,6 +1,6 @@
 [package]
 name = "adaliszk-prelude"
-version.workspace = true
+version = "0.1.1"
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
@@ -21,3 +21,6 @@ strum.workspace = true
 thiserror.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json"] }
 tracing-appender = { version = "0.2" }
+
+[package.metadata.release]
+shared-version = "prelude"

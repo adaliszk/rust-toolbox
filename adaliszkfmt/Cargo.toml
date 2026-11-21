@@ -13,3 +13,7 @@ readme = "README.md"
 [[bin]]
 name = "adaliszkfmt"
 path = "source/main.rs"
+
+[package.metadata.release]
+shared-version = false
+release = false

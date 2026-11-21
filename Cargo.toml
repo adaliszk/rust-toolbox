@@ -2,11 +2,11 @@
 resolver = "3"
 members = [
     "adaliszkfmt",
-  "adaliszk_foundation",
-#  "adaliszk_console",
-#  "adalsizk_console/macros",
-#  "adaliszk_commands",
-#  "adaliszk_commands/macros",
+    "adaliszk_foundation",
+    # "adaliszk_console",
+    # "adalsizk_console/macros",
+    # "adaliszk_commands",
+    # "adaliszk_commands/macros",
 ]
 
 [workspace.package]

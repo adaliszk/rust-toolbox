@@ -21,12 +21,12 @@ adaliszkfmt init
 
 Restart your shell after `init` for applying the changes!
 
-The **init** automation currently targets Windows. On other platforms, set `RUSTFMT` to the
+The **init** automation currently targets Windows. Other platforms, set `RUSTFMT` to the
 installed binary path in your shell profile manually until `0.2.x`.
 
 ## Why do this?
 
-Short answer: purely a tool for my own projects, but anyone is welcome to use it.
+Short answer: purely a tool for my own projects.
 
 Long answer: The same formatting style tends to repeat across projects or left for defaults.
 Unfortunately, **rustfmt.toml** has no import or inheritance mechanism, so the file gets copied

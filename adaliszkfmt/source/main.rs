@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2026, Ádám Liszkai "Kicsivazz" and Contributors
-// SPDX-License-Identifier: MPL-2.
+// SPDX-FileCopyrightText: 2026, Ádám Liszkai and Contributors
+// SPDX-License-Identifier: MPL-2.0
 //!
 //! `adaliszkfmt` is a drop-in `rustfmt` and `rustup` shim with a custom configuration.
 //!
@@ -11,6 +11,7 @@
 //! ```
 //!
 
+use std::path::Path;
 use std::{env, fs, process::Command};
 
 // Bake a file into the binary for runtime usage
@@ -47,9 +48,8 @@ fn format()
 fn init()
 {
     // Install the nightly rustfmt to allow the experimental flags to be used
-    run(
-        "rustup",
-        &[
+    let status = Command::new("rustup")
+        .args([
             "toolchain",
             "install",
             "nightly",
@@ -57,29 +57,38 @@ fn init()
             "minimal",
             "--component",
             "rustfmt",
-        ],
-    );
+        ])
+        .status()
+        .expect("failed to execute rustup")
+        .code()
+        .unwrap_or(1);
 
     // Overwrite the RUSTFMT path to the `adaliszkfmt` for future shells
-    let current_exe = env::current_exe().expect("failed to get current exe");
-    run(
-        "setx",
-        &["RUSTFMT", current_exe.to_str().expect("bad utf8")],
-    );
+    let current_binary = env::current_exe().expect("failed to get current exe");
+    setenv(&current_binary);
 
     eprintln!("Installed `adaliszkfmt`, please set the rust-analyzer in your editor!");
     eprintln!("For the shell session, please restart to see the changes applied!");
+
+    std::process::exit(status);
 }
 
-fn run(cmd: &str, args: &[&str])
+#[cfg(windows)]
+fn setenv(bin: &Path)
 {
-    let ok = Command::new(cmd)
-        .args(args)
+    Command::new("setx")
+        .args([
+            "RUSTFMT",
+            bin.to_str().expect("failed to convert binary path"),
+        ])
         .status()
         .map(|status| status.success())
-        .unwrap_or(false);
-    if !ok {
-        eprintln!("adaliszkfmt init: {cmd} failed");
-        std::process::exit(1);
-    }
+        .unwrap();
+}
+
+#[cfg(unix)]
+fn setenv(bin: &Path)
+{
+    eprintln!("adaliszkfmt init: Unix currently not supported");
+    std::process::exit(1);
 }

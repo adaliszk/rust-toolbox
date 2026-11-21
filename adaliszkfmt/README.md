@@ -19,19 +19,18 @@ adaliszkfmt init
 - Installs the nightly `rustfmt` component through `rustup`
 - Registers `adaliszkfmt` as the `RUSTFMT` binary for shell
 
-> Restart your shell after `init` for applying the changes!
+Restart your shell after `init` for applying the changes!
 
 The **init** automation currently targets Windows. On other platforms, set `RUSTFMT` to the
 installed binary path in your shell profile manually until `0.2.x`.
 
 ## Why do this?
 
-The same formatting style tends to repeat across projects. A shared **rustfmt.toml** has no
-import or inheritance mechanism, so the file gets copied and drifts. A custom ship instead
-embeds the style in the binary instead. One installation carries the style everywhere, and
-nightly-only options stay available with the expected initialization.
+Short answer: purely a tool for my own projects, but anyone is welcome to use it.
 
-This is purely a tool for my own projects, but anyone is welcome to use it!
+Long answer: The same formatting style tends to repeat across projects or left for defaults.
+Unfortunately, **rustfmt.toml** has no import or inheritance mechanism, so the file gets copied
+and drifts, and any preferences or extensions needs to be updated or simply give up.
 
 ### JetBrains RustRover
 

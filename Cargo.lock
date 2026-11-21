@@ -3,5 +3,9 @@
 version = 4
 
 [[package]]
+name = "adaliszk_foundation"
+version = "0.1.0"
+
+[[package]]
 name = "adaliszkfmt"
-version = "0.1.5"
+version = "0.1.6"

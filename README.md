@@ -44,18 +44,18 @@ A complete consumer flake that reuses both looks like:
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     toolbox.url = "github:adaliszk/rust-toolbox?dir=nix";
-    flake-utils.url = "github:numtide/flake-utils";
+    utils.url = "github:numtide/flake-utils";
   };
   outputs =
-    { nixpkgs, flake-utils, toolbox, ... }:
-    flake-utils.lib.eachDefaultSystem (
+    { utils, toolbox, ... }:
+    utils.lib.eachDefaultSystem (
       system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-      in
       {
-        # Reuse the toolbox development shell as-is.
-        devShells.default = toolbox.devShells.${system}.default;
+        # Toolbox tooling plus `<bin>` run shortcuts and a `watch <bin>` loop.
+        devShells.default = toolbox.lib.mkDevShell {
+          inherit system;
+          binaries = [ "api" ];
+        };
         # Multi-arch image (amd64 + arm64): `system` is only the build host, the targets
         # come from `systems` (default: ["x86_64-linux", "aarch64-linux"]).
         packages.api = toolbox.lib.mkRustContainer {
@@ -69,7 +69,10 @@ A complete consumer flake that reuses both looks like:
 }
 ```
 
-Build and push the multi-arch image with `nix run .#api` that auto-tags with the cargo version.
+This gives two things:
+
+1. `mkDevShell` to prepare development environment with wrappers for binaries
+2. `mkRustContainer` multi-arch container builds to one or more registries
 
 ## License & Disclosure
 

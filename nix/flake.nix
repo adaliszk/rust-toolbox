@@ -3,7 +3,6 @@
 #
 {
   description = "Development environment and container builders for the AdaLiszk's Toolbox";
-
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -16,7 +15,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-
   outputs =
     {
       self,
@@ -27,7 +25,7 @@
     }:
     let
       mkRustContainer = import ./container.nix { inherit nix2container nixpkgs; };
-      mkDevShell = import ./develop.nix;
+      mkDevShell = import ./develop.nix { inherit nixpkgs rust-overlay; };
     in
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -51,15 +49,12 @@
               ];
             };
         adaliszkfmt = pkgs.rustPlatform.buildRustPackage {
-          pname = "adaliszkfmt";
           version = (builtins.fromTOML (builtins.readFile ../adaliszkfmt/Cargo.toml)).package.version;
-          src = ../.;
+          pname = "adaliszkfmt";
           cargoLock.lockFile = ../Cargo.lock;
           cargoBuildFlags = [ "-p" "adaliszkfmt" ];
+          src = ../.;
         };
-
-        # adaliszkfmt shells out to `rustfmt`; put the nightly one on PATH so its
-        # nightly-only config applies, while the compiler stays on the pinned channel.
         fmtShim = pkgs.writeShellScriptBin "adaliszkfmt" ''
           export PATH="${pkgs.rust-bin.nightly.latest.rustfmt}/bin:$PATH"
           exec ${adaliszkfmt}/bin/adaliszkfmt "$@"
@@ -68,7 +63,7 @@
       {
         packages.adaliszkfmt = adaliszkfmt;
         devShells.default = mkDevShell {
-          inherit pkgs rustToolchain;
+          inherit system pkgs rustToolchain;
           formatter = fmtShim;
         };
       }

@@ -1,0 +1,27 @@
+[package]
+name = "adaliszk-console-macros"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Procedural-macro companion for adaliszk-console."
+keywords = ["macros", "proc-macro", "cli", "command", "console"]
+categories = ["development-tools::procedural-macro-helpers"]
+repository = "https://codeberg.org/adaliszk/rust-toolbox"
+readme = "README.md"
+
+[lib]
+proc-macro = true
+path = "source/lib.rs"
+
+[dependencies]
+quote = { version = "1.0" }
+syn = { version = "3.0", features = ["full"] }
+
+[dev-dependencies]
+adaliszk-console = { path = ".." }
+googletest.workspace = true
+trybuild = "1.0"
+
+[package.metadata.release]
+shared-version = "console"

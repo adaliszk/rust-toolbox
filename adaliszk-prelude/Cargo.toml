@@ -22,5 +22,9 @@ thiserror.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json"] }
 tracing-appender = { version = "0.2" }
 
+[dev-dependencies]
+rstest.workspace = true
+googletest.workspace = true
+
 [package.metadata.release]
 shared-version = "prelude"

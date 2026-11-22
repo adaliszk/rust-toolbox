@@ -19,7 +19,7 @@ quote = { version = "1.0" }
 cargo_metadata = { version = "0.23" }
 
 [dev-dependencies]
-googletest = { version = "0.14" }
+googletest.workspace = true
 
 [package.metadata.release]
 shared-version = "prelude"

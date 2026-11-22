@@ -4,6 +4,8 @@
 use serde::de::DeserializeOwned;
 use std::path::Path;
 
+pub use crate::types::LoggingConfig;
+
 #[derive(Debug, thiserror::Error)]
 pub enum ParseError
 {

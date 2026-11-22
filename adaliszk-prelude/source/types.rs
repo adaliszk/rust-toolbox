@@ -20,8 +20,25 @@ impl Default for LoggingConfig
         Self {
             level: LogLevel::default(),
             format: LogFormat::default(),
-            dir: PathBuf::from("/var/lib/application/logs"),
+            dir: PathBuf::from("storage/logs"),
         }
+    }
+}
+
+#[cfg(test)]
+mod logging_config_test
+{
+    use super::*;
+    use googletest::prelude::*;
+
+    #[test]
+    fn logging_config_default_uses_system_log_dir()
+    {
+        let config = LoggingConfig::default();
+
+        assert_that!(config.level, eq(LogLevel::Info));
+        assert_that!(config.format, eq(LogFormat::Compact));
+        assert_that!(config.dir, eq(&PathBuf::from("storage/logs")));
     }
 }
 
@@ -54,6 +71,33 @@ pub enum LogLevel
     Error,
 }
 
+#[cfg(test)]
+mod log_level_test
+{
+    use super::*;
+    use googletest::prelude::*;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case("trace", LogLevel::Trace)]
+    #[case("debug", LogLevel::Debug)]
+    #[case("info", LogLevel::Info)]
+    #[case("warn", LogLevel::Warn)]
+    #[case("error", LogLevel::Error)]
+    fn log_level_deserializes_from_lowercase(#[case] input: &str, #[case] expected: LogLevel)
+    {
+        let parsed: LogLevel = serde_norway::from_str(input).expect("valid level");
+        assert_that!(parsed, eq(expected));
+    }
+
+    #[test]
+    fn log_level_renders_lowercase()
+    {
+        assert_that!(LogLevel::Warn.to_string().as_str(), eq("warn"));
+        assert_that!(<&str>::from(LogLevel::Error), eq("error"));
+    }
+}
+
 #[derive(
     Serialize,
     Deserialize,
@@ -70,11 +114,25 @@ pub enum LogLevel
 #[serde(rename_all = "lowercase")]
 pub enum LogFormat
 {
-    /// Nicely readable YAML-like output.
-    Pretty,
     /// Terse single-line notes.
     #[default]
     Compact,
     /// Parsable JSON-lines.
     Structured,
+}
+
+#[cfg(test)]
+mod log_format_test
+{
+    use super::*;
+    use googletest::prelude::*;
+    use rstest::rstest;
+    #[rstest]
+    #[case("compact", LogFormat::Compact)]
+    #[case("structured", LogFormat::Structured)]
+    fn log_format_deserializes_from_lowercase(#[case] input: &str, #[case] expected: LogFormat)
+    {
+        let parsed: LogFormat = serde_norway::from_str(input).expect("valid format");
+        assert_that!(parsed, eq(expected));
+    }
 }

@@ -33,6 +33,44 @@ While each crate explain what they do individually, the overall design can be fo
 in [DESIGN.md](./DESIGN.md). In a nutshell; most commands expose their inventory, macros, and
 prelude methods for easy wiring while keeping the domain-code simple.
 
+## Nix & Containerization
+
+A flake in [`nix`](nix) provides a development shell and a reusable container builder.
+A complete consumer flake that reuses both looks like:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    toolbox.url = "github:adaliszk/rust-toolbox?dir=nix";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+  outputs =
+    { nixpkgs, flake-utils, toolbox, ... }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
+        # Reuse the toolbox development shell as-is.
+        devShells.default = toolbox.devShells.${system}.default;
+        # Multi-arch image (amd64 + arm64): `system` is only the build host, the targets
+        # come from `systems` (default: ["x86_64-linux", "aarch64-linux"]).
+        packages.api = toolbox.lib.mkRustContainer {
+          inherit system;
+          registry = "ghcr.io/adaliszk";
+          pname = "api";
+          src = ./.;
+        };
+      }
+    );
+}
+```
+
+Build and push the multi-arch image with `nix run .#api`, or override the destination with
+`nix run .#api -- registry/repo:tag` directly.
+
 ## License & Disclosure
 
 Licensed under the Mozilla Public License 2.0 (MPL-2.0). See [LICENSE](./LICENSE.md)

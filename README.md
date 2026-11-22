@@ -36,6 +36,7 @@ prelude methods for easy wiring while keeping the domain-code simple.
 ## Nix & Containerization
 
 A flake in [`nix`](nix) provides a development shell and a reusable container builder.
+
 A complete consumer flake that reuses both looks like:
 
 ```nix
@@ -68,8 +69,7 @@ A complete consumer flake that reuses both looks like:
 }
 ```
 
-Build and push the multi-arch image with `nix run .#api`, or override the destination with
-`nix run .#api -- registry/repo:tag` directly.
+Build and push the multi-arch image with `nix run .#api` that auto-tags with the cargo version.
 
 ## License & Disclosure
 

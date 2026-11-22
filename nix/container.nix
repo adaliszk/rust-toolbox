@@ -80,7 +80,14 @@ let
 
   platforms = hostPkgs.lib.concatMapStringsSep "," (target: "linux/${archOf.${target}}") systems;
 
-  defaultDest = if registry != null then "${registry}/${pname}:${version}" else "";
+  registries =
+    if registry == null then
+      [ ]
+    else if builtins.isList registry then
+      registry
+    else
+      [ registry ];
+  defaultDests = map (reg: "${reg}/${pname}:${version}") registries;
 in
 hostPkgs.writeShellApplication {
   name = "push-${pname}";
@@ -89,21 +96,28 @@ hostPkgs.writeShellApplication {
     hostPkgs.manifest-tool
   ];
   text = ''
-    dest="''${1:-${defaultDest}}"
-    if [ -z "$dest" ]; then
-      echo "push-${pname}: pass <registry/repo:tag>, or set \`registry\` in mkRustContainer" >&2
+    if [ "$#" -gt 0 ]; then
+      dests=("$@")
+    else
+      dests=(${hostPkgs.lib.escapeShellArgs defaultDests})
+    fi
+
+    if [ "''${#dests[@]}" -eq 0 ]; then
+      echo "push-${pname}: pass <registry/repo:tag>..., or set \`registry\` in mkRustContainer" >&2
       exit 1
     fi
 
-    # Push each architecture to a per-arch tag.
-    ${hostPkgs.lib.concatMapStringsSep "\n" ({ arch, image }: ''
-      "${image.copyTo}/bin/copy-to" "docker://''${dest}-${arch}"
-    '') images}
+    for dest in "''${dests[@]}"; do
+      # Push each architecture to a per-arch tag.
+      ${hostPkgs.lib.concatMapStringsSep "\n      " (
+        { arch, image }: ''"${image.copyTo}/bin/copy-to" "docker://''${dest}-${arch}"''
+      ) images}
 
-    # Stitch the per-arch tags into one multi-arch manifest list.
-    manifest-tool push from-args \
-      --platforms "${platforms}" \
-      --template "''${dest}-ARCH" \
-      --target "''${dest}"
+      # Stitch the per-arch tags into one multi-arch manifest list.
+      manifest-tool push from-args \
+        --platforms "${platforms}" \
+        --template "''${dest}-ARCH" \
+        --target "''${dest}"
+    done
   '';
 }

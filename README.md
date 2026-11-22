@@ -18,41 +18,20 @@ a decade now. Nothing crazy, 99% the official with a tiny tweak here and there.
 
 ## Packages (Crates)
 
-| Name                                               | Type    | Purpose                                          | Crate                                                                                                                            |
-|:---------------------------------------------------|:--------|:-------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------|
-| [`adaliszkfmt`](./adaliszkfmt/README.md)           | CLI     | Drop-in `rustfmt` shim bundling a personal style | [![v](https://img.shields.io/crates/v/adaliszkfmt?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszkfmt)         |
+| Name                                               | Type    | Purpose                                          | Crate                                                                                                                              |
+|:---------------------------------------------------|:--------|:-------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------|
+| [`adaliszkfmt`](./adaliszkfmt/README.md)           | CLI     | Drop-in `rustfmt` shim bundling a personal style | [![v](https://img.shields.io/crates/v/adaliszkfmt?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszkfmt)           |
 | [`adaliszk-prelude`](./adaliszk-prelude/README.md) | Library | Configure, Log, and Monitor applications         | [![v](https://img.shields.io/crates/v/adaliszk-prelude?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-prelude) |
-| `adaliszk-console`                                 | Library | _Inventory for Clap-based CLI applications_      | —                                                                                                                                |
-| `adaliszk-commands`                                | Library | _Inventory for Command-builder for integrations_ | —                                                                                                                                |
-| `adlaiszk-terminal`                                | Library | _Inventory for Rattatui-based CLI applications_  | —                                                                                                                                |
-| `adlaiszk-events`                                  | Library | _Inventory for Tokoi-based eventing_             | —                                                                                                                                |
+| [`adaliszk-console`](./adaliszk-console/README.md) | Library | Inventory for Clap-based CLI applications        | [![v](https://img.shields.io/crates/v/adaliszk-console?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-console) |
+| `adaliszk-commands`                                | Library | _Inventory for Command-builder for integrations_ | —                                                                                                                                  |
+| `adlaiszk-terminal`                                | Library | _Inventory for Rattatui-based CLI applications_  | —                                                                                                                                  |
+| `adlaiszk-events`                                  | Library | _Inventory for Tokoi-based eventing_             | —                                                                                                                                  |
 
 ### Design & Concept
 
-All applications need a configuration, logging, and monitoring, which could be set up
-by using the `adaliszk-prelude`:
-
-```rust
-use adaliszk_prelude::config::{LoggingConfig, parse_config};
-use adaliszk_prelude::tracing::{workspace_crates, init_tracing};
-use serde::Deserialize;
-
-#[derive(Deserialize)]
-struct ApplicationConfig {
-    timezone: String,
-    logging: LoggingConfig,
-}
-
-// Parse the config using TOML, into a serde/strum dict:
-let config: ApplicationConfig = parse_config("config.yaml".as_ref());
-
-// Initialize the tracing using the config:
-let guard = init_tracing(workspace_crates!(), &config.logging);
-```
-
-From there, the particular application is expected to be split into multiple local crates, where
-[inventory](https://crates.io/crates/inventory) is used under the hood to distribute plugins
-that has been declared by the various use-case libraries.
+While each crate explain what they do individually, the overall design can be found
+in [DESIGN.md](./DESIGN.md). In a nutshell; most commands expose their inventory, macros, and
+prelude methods for easy wiring while keeping the domain-code simple.
 
 ## License & Disclosure
 

@@ -50,9 +50,27 @@
                 "clippy"
               ];
             };
+        adaliszkfmt = pkgs.rustPlatform.buildRustPackage {
+          pname = "adaliszkfmt";
+          version = (builtins.fromTOML (builtins.readFile ../adaliszkfmt/Cargo.toml)).package.version;
+          src = ../.;
+          cargoLock.lockFile = ../Cargo.lock;
+          cargoBuildFlags = [ "-p" "adaliszkfmt" ];
+        };
+
+        # adaliszkfmt shells out to `rustfmt`; put the nightly one on PATH so its
+        # nightly-only config applies, while the compiler stays on the pinned channel.
+        fmtShim = pkgs.writeShellScriptBin "adaliszkfmt" ''
+          export PATH="${pkgs.rust-bin.nightly.latest.rustfmt}/bin:$PATH"
+          exec ${adaliszkfmt}/bin/adaliszkfmt "$@"
+        '';
       in
       {
-        devShells.default = mkDevShell { inherit pkgs rustToolchain; };
+        packages.adaliszkfmt = adaliszkfmt;
+        devShells.default = mkDevShell {
+          inherit pkgs rustToolchain;
+          formatter = fmtShim;
+        };
       }
     )
     // {

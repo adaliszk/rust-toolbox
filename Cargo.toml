@@ -12,8 +12,8 @@ members = [
 
 [workspace.metadata.release]
 shared-version = true
-tag-name = "v{{version}}"
-pre-release-commit-message = "chore: release v{{version}}"
+tag-name = "{{crate_name}}@v{{version}}"
+pre-release-commit-message = "chore({{crate_name}}): release v{{version}}"
 publish = true # FUTURE: turn into `false` when automation introduced
 push = true
 

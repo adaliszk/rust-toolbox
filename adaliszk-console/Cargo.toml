@@ -1,6 +1,6 @@
 [package]
 name = "adaliszk-console"
-version = "0.1.0"
+version = "0.1.1"
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
@@ -15,7 +15,7 @@ path = "source/lib.rs"
 
 [dependencies]
 adaliszk-prelude = { path = "../adaliszk-prelude", version = "0.1.3" }
-adaliszk-console-macros = { path = "./macros", version = "0.1.0" }
+adaliszk-console-macros = { path = "./macros", version = "0.1.1" }
 async-trait.workspace = true
 clap = { version = "4.6", features = ["derive", "env"] }
 inventory.workspace = true

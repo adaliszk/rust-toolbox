@@ -5,35 +5,57 @@ parsed configuration from a common type declared in user-space.
 
 ## Example Usage
 
-A command is a struct with its own flags plus a handler:
+You would declare in your own scope an application config:
+
+```rust
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+pub struct AppConfig
+{
+    // Whatever your application sets globally
+}
+```
+
+Then declare a command is a struct with its own flags plus a handler:
 
 ```rust
 use adaliszk_console::{ConsoleArgs, ConsoleHandler, ConsoleResult, console};
+use your_foundation::AppConfig;
 
 #[derive(ConsoleArgs)]
-struct Serve;
+pub struct ExampleCommand;
 
-#[console(name = "serve")]
-impl ConsoleHandler<AppConfig> for Serve {
-    async fn handle(&self, config: &AppConfig) -> ConsoleResult {
-        Ok(())
+#[console(name = "example")]
+impl ConsoleHandler<AppConfig> for ExampleCommand
+{
+    async fn handle(&self, config: &AppConfig) -> ConsoleResult
+    {
+        todo!()
     }
 }
 ```
 
-Resolve the invoked command in `main`, read the config, then run it:
+Resolve the registered, read the config, then run it:
 
 ```rust
+use adaliszk_console::{ConsoleResult, resolve_console};
+use adaliszk_prelude::tracing::{init_tracing, workspace_crates};
+use your_foundation::AppConfig;
+
+// Load all the crates that register commands:
+use your_example_crate as _;
+
 #[tokio::main]
-async fn main() -> ConsoleResult {
+async fn main() -> ConsoleResult
+{
     let app = resolve_console::<AppConfig>("cli")?;
-    let _logging = init_tracing(workspace_crates!(), &app.config().logging)?;
+    let crates = workspace_crates!();
+    let _logging = init_tracing(crates.clone(), &app.config().logging)?;
+    tracing::info!("Loaded modules: {}", crates.join(", "));
     app.resolve().await
 }
 ```
-
-`AppConfig` is your own configuration type, declared and shared by every command. The
-`#[console]` macro reads it from the handler and passes the parsed config.
 
 ## Why do this?
 

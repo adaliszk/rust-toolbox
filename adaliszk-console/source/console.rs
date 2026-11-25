@@ -3,7 +3,6 @@
 
 pub use adaliszk_console_macros::console;
 use crate::{Async, ConsoleResult};
-use std::path::PathBuf;
 
 /// The global arguments shared by every command, parameterized by `CONFIG` type.
 ///

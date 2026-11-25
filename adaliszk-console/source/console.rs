@@ -4,11 +4,6 @@
 pub use adaliszk_console_macros::console;
 use crate::{Async, ConsoleResult};
 
-/// The global arguments shared by every command, parameterized by `CONFIG` type.
-///
-/// The derived `--config <CONFIG_FILE>` argument collects the intended config files.
-///
-/// [`resolve_console`](crate::resolve_console) augments the CLI with these options.
 #[derive(clap::Args)]
 pub struct ConsoleOptions
 {

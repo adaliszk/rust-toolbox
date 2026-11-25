@@ -79,7 +79,10 @@ impl ResolvedConsoleCommand
 pub fn resolve_console(name: &'static str) -> Result<ResolvedConsoleCommand, AsyncError>
 {
     let mut cli = Command::new(name);
-    cli = ConsoleOptions::augment_args(cli);
+    cli = ConsoleOptions::augment_args(cli)
+        // TODO: add description and version for the main command
+        .arg_required_else_help(true)
+        .subcommand_required(true);
 
     for registration in inventory::iter::<&'static dyn ConsoleRegistration> {
         let command = Command::new(registration.signature());

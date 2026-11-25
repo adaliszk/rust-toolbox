@@ -1,39 +1,25 @@
 // SPDX-FileCopyrightText: 2026, Ádám Liszkai "Kicsivazz" and Contributors
 // SPDX-License-Identifier: MPL-2.0
 
-use crate::{Async, ConsoleResult};
-use adaliszk_prelude::config::{ParseError, parse_config};
-
 pub use adaliszk_console_macros::console;
-use serde::de::DeserializeOwned;
-use std::path::Path;
+use crate::{Async, ConsoleResult};
+use std::path::PathBuf;
 
 /// The global arguments shared by every command, parameterized by `CONFIG` type.
 ///
-/// The derived `--config <CONFIG_FILE>` argument loads and deserializes a file into `CONFIG`.
-/// It is `global`, so it applies to every subcommand.
+/// The derived `--config <CONFIG_FILE>` argument collects the intended config files.
 ///
 /// [`resolve_console`](crate::resolve_console) augments the CLI with these options.
 #[derive(clap::Args)]
-pub struct ConsoleOptions<CONFIG : DeserializeOwned + Clone + Send + Sync + 'static>
+pub struct ConsoleOptions
 {
-    /// The parsed configuration, loaded from the `--config` file.
     #[arg(
         long,
         help = "Load configuration from a file",
-        value_name = "CONFIG_FILE",
         default_value = "config.yaml",
-        value_parser = parse_config_arg::<CONFIG>,
         global = true,
     )]
-    pub config: CONFIG,
-}
-
-fn parse_config_arg<CONFIG: DeserializeOwned>(path: &str) -> Result<CONFIG, ParseError>
-{
-    // FUTURE: Switch to extension detection, and parse JSON, YAML, TOML
-    // FUTURE: Parse entire folders by merging keys by the path
-    parse_config(Path::new(path))
+    pub config: String,
 }
 
 /// Each command implements a handler that can ship its own clap arguments.

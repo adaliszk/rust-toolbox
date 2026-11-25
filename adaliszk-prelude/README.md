@@ -20,18 +20,21 @@ cargo add adaliszk-prelude
 Parse a config file into a typed struct, then initialize logging from it:
 
 ```rust
-use adaliszk_prelude::config::{LoggingConfig, parse_config};
+use adaliszk_prelude::config::{LoggingConfig, parse_files};
 use adaliszk_prelude::tracing::{workspace_crates, init_tracing};
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+// `#[serde(default)]` makes the struct's `Default` the base layer, so config
+// files only need to specify the keys they override:
+#[derive(Deserialize, Default)]
+#[serde(default)]
 struct ApplicationConfig {
     timezone: String,
     logging: LoggingConfig,
 }
 
-// Parse the config using TOML, into a serde/strum dict:
-let config: ApplicationConfig = parse_config("config.yaml".as_ref());
+// Parse one or more config files (format picked by extension) into the struct:
+let config: ApplicationConfig = parse_files(&["config.yaml".into()]).expect("parse config");
 
 // Initialize the tracing using the config:
 let guard = init_tracing(workspace_crates!(), &config.logging);

@@ -2,23 +2,27 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use crate::{AsyncError, ConsoleOptions, ConsoleRegistration, ConsoleResult};
+use adaliszk_prelude::config::{ParseError, parse_files, resolve_paths};
 use clap::{ArgMatches, Args, Command, FromArgMatches};
 use serde::de::DeserializeOwned;
 
 /// A matched command context returned by [`resolve_console`].
-pub struct ResolvedConsoleCommand<CONFIG: DeserializeOwned + Clone + Send + Sync + 'static>
+pub struct ResolvedConsoleCommand
 {
     registration: &'static dyn ConsoleRegistration,
-    config: CONFIG,
+    config: String,
     params: ArgMatches,
 }
 
-impl<CONFIG: DeserializeOwned + Clone + Send + Sync + 'static> ResolvedConsoleCommand<CONFIG>
+impl ResolvedConsoleCommand
 {
-    /// The parsed global configuration, for example to pass to `init_tracing`.
-    pub fn config(&self) -> &CONFIG
+    /// Resolve the global `--config` glob and layer the matching files into `CONFIG`.
+    ///
+    /// The glob expands to a sorted file list, then each file merges left to
+    /// right so a later file overrides an earlier one.
+    pub fn load_config<CONFIG: DeserializeOwned>(&self) -> Result<CONFIG, ParseError>
     {
-        &self.config
+        parse_files(&resolve_paths(&self.config)?)
     }
 
     /// Resolve the command result by running the handler with the parsed params.
@@ -51,15 +55,16 @@ impl<CONFIG: DeserializeOwned + Clone + Send + Sync + 'static> ResolvedConsoleCo
 ///     logging: LoggingConfig,
 /// }
 ///
-/// // Import workspace crates os their inventory could register:
+/// // Import workspace crates so their inventory could register:
 /// use example_crate as _;
 ///
 /// #[tokio::main]
 /// async fn main() -> ConsoleResult
 /// {
-///     let app = resolve_console::<AppConfig>("cli")?;
-///     let _logging = init_tracing(workspace_crates!(), &app.config().logging)?;
-///     // ^^^ Note the guard here needs to exist toe keep trace logging alive!
+///     let app = resolve_console("cli")?;
+///     let config: AppConfig = app.load_config()?;
+///     let _logging = init_tracing(workspace_crates!(), &config.logging)?;
+///     // ^^^ Note the guard here needs to stay bound to keep trace logging alive!
 ///     app.resolve().await
 /// }
 /// ```
@@ -71,12 +76,10 @@ impl<CONFIG: DeserializeOwned + Clone + Send + Sync + 'static> ResolvedConsoleCo
 /// # Panics
 ///
 /// Panics when clap matched no subcommand, which clap normally prevents.
-pub fn resolve_console<CONFIG: DeserializeOwned + Clone + Send + Sync + 'static>(
-    name: &'static str,
-) -> Result<ResolvedConsoleCommand<CONFIG>, AsyncError>
+pub fn resolve_console(name: &'static str) -> Result<ResolvedConsoleCommand, AsyncError>
 {
     let mut cli = Command::new(name);
-    cli = ConsoleOptions::<CONFIG>::augment_args(cli);
+    cli = ConsoleOptions::augment_args(cli);
 
     for registration in inventory::iter::<&'static dyn ConsoleRegistration> {
         let command = Command::new(registration.signature());
@@ -84,14 +87,14 @@ pub fn resolve_console<CONFIG: DeserializeOwned + Clone + Send + Sync + 'static>
     }
 
     let matches = cli.get_matches();
-    let options = ConsoleOptions::<CONFIG>::from_arg_matches(&matches)?;
+    let options = ConsoleOptions::from_arg_matches(&matches)?;
     let (name, params) = matches.subcommand().unwrap();
 
     for registration in inventory::iter::<&'static dyn ConsoleRegistration> {
         if registration.signature() == name {
             return Ok(ResolvedConsoleCommand {
                 registration: *registration,
-                config: options.config,
+                config: options.config.clone(),
                 params: params.clone(),
             });
         }

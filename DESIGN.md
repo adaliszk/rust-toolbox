@@ -6,18 +6,21 @@ All applications need a configuration, logging, and monitoring, which could be s
 by using the `adaliszk-prelude`:
 
 ```rust
-use adaliszk_prelude::config::{LoggingConfig, parse_config};
+use adaliszk_prelude::config::{LoggingConfig, parse_files};
 use adaliszk_prelude::tracing::{workspace_crates, init_tracing};
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+// `#[serde(default)]` makes the struct's `Default` the base layer, so config
+// files only need to specify the keys they override:
+#[derive(Deserialize, Default)]
+#[serde(default)]
 struct ApplicationConfig {
     timezone: String,
     logging: LoggingConfig,
 }
 
-// Parse the config using TOML, into a serde/strum dict:
-let config: ApplicationConfig = parse_config("config.yaml".as_ref());
+// Parse one or more config files (format picked by extension) into the struct:
+let config: ApplicationConfig = parse_files(&["config.yaml".into()]).expect("parse config");
 
 // Initialize the tracing using the config:
 let guard = init_tracing(workspace_crates!(), & config.logging);
@@ -60,9 +63,10 @@ up by two parts.
    #[tokio::main]
    async fn main() -> ConsoleResult
    {
-       let app = resolve_console::<ApplicationConfig>("cli")?;
-       let _logging = init_tracing(workspace_crates!(), &app.config().logging)?;
-       //  ^^^ Note the guard here needs to exist toe keep trace logging alive!
+       let app = resolve_console("cli")?;
+       let config: ApplicationConfig = app.load_config()?;
+       let _logging = init_tracing(workspace_crates!(), &config.logging)?;
+       //  ^^^ guard must stay bound to keep trace logging alive
        app.resolve().await
    }
    ```

@@ -1,0 +1,2 @@
+logging:
+  dir: /custom/logs

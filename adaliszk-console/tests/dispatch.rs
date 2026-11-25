@@ -39,7 +39,7 @@ async fn dispatch_passes_parsed_config_to_handler()
         .find(|registration| registration.signature() == "test")
         .expect("record command is registered");
 
-    let cli = ConsoleOptions::<TestConfig>::augment_args(Command::new("app"));
+    let cli = ConsoleOptions::augment_args(Command::new("app"));
     let cli =
         cli.subcommand(registration.augment_command(Command::new(registration.signature())));
 

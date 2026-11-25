@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "adaliszk-console"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "adaliszk-console-macros",
  "adaliszk-prelude",
@@ -21,7 +21,7 @@ dependencies = [
 
 [[package]]
 name = "adaliszk-console-macros"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "adaliszk-console",
  "googletest",
@@ -32,7 +32,7 @@ dependencies = [
 
 [[package]]
 name = "adaliszk-prelude"
-version = "0.1.3"
+version = "0.2.0"
 dependencies = [
  "adaliszk-prelude-macros",
  "glob",
@@ -50,7 +50,7 @@ dependencies = [
 
 [[package]]
 name = "adaliszk-prelude-macros"
-version = "0.1.3"
+version = "0.2.0"
 dependencies = [
  "cargo_metadata",
  "googletest",

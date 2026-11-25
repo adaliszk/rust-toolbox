@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "adaliszk-console"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "adaliszk-console-macros",
  "adaliszk-prelude",
@@ -21,7 +21,7 @@ dependencies = [
 
 [[package]]
 name = "adaliszk-console-macros"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "adaliszk-console",
  "googletest",

@@ -22,6 +22,7 @@ a decade now. Nothing crazy, 99% the official with a tiny tweak here and there.
 |:---------------------------------------------------|:--------|:-------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------|
 | [`adaliszkfmt`](./adaliszkfmt/README.md)           | CLI     | Drop-in `rustfmt` shim bundling a personal style | [![v](https://img.shields.io/crates/v/adaliszkfmt?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszkfmt)           |
 | [`adaliszk-prelude`](./adaliszk-prelude/README.md) | Library | Configure, Log, and Monitor applications         | [![v](https://img.shields.io/crates/v/adaliszk-prelude?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-prelude) |
+| [`adaliszk-anymap`](./adaliszk-anymap/README.md)   | Library | Type-keyed DI container with factory bindings     | [![v](https://img.shields.io/crates/v/adaliszk-anymap?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-anymap)   |
 | [`adaliszk-console`](./adaliszk-console/README.md) | Library | Inventory for Clap-based CLI applications        | [![v](https://img.shields.io/crates/v/adaliszk-console?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-console) |
 | `adaliszk-commands`                                | Library | _Inventory for Command-builder for integrations_ | —                                                                                                                                  |
 | `adlaiszk-terminal`                                | Library | _Inventory for Rattatui-based CLI applications_  | —                                                                                                                                  |
@@ -89,3 +90,6 @@ limitations to retain the quality and understanding!
 Refinements and fixes are generally accepted with [**No-Automated-LLM
 Contributions** policy](AGENTS.md), where we explicitly disallow the usage of LLM tools to
 automatically make changes, but they may be used to aid your own skills.
+
+The code is managed on [CodeBerg](https://codeberg.org/adaliszk/rust-toolbox), so issues and
+pull requests should be made there, not on any of the mirrors!

@@ -14,7 +14,7 @@ readme = "README.md"
 path = "source/lib.rs"
 
 [dependencies]
-adaliszk-anymap-macros = { path = "./macros", version = "0.1.0" }
+adaliszk-anymap-macros = { path = "./macros", version = "0.1.1" }
 anymap3 = { version = "1.1" }
 thiserror.workspace = true
 

@@ -1,0 +1,21 @@
+error[E0277]: the trait bound `NotClone: Clone` is not satisfied
+ --> tests/examples/not_clone.rs:4:10
+  |
+4 | #[derive(Resolvable)]
+  |          ^^^^^^^^^^ the trait `Clone` is not implemented for `NotClone`
+  |
+note: required by a bound in `Option::<&T>::cloned`
+ --> $RUST/core/src/option.rs
+  |
+  | impl<T> Option<&T> {
+...
+  |     pub fn cloned(self) -> Option<T>
+  |     where
+  |         T: Clone,
+  |            ^^^^^ required by this bound in `Option::<&T>::cloned`
+  = note: this error originates in the derive macro `Resolvable` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider annotating `NotClone` with `#[derive(Clone)]`
+  |
+5 + #[derive(Clone)]
+6 | struct NotClone
+  |

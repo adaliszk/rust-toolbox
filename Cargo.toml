@@ -2,6 +2,8 @@
 resolver = "3"
 members = [
     "adaliszkfmt",
+    "adaliszk-anymap/macros",
+    "adaliszk-anymap",
     "adaliszk-prelude/macros",
     "adaliszk-prelude",
     "adaliszk-console/macros",
@@ -24,11 +26,10 @@ rust-version = "1.100"
 
 [workspace.dependencies]
 async-trait = { version = "0.1" }
-futures = { version = "0.3" }
 inventory = { version = "0.3" }
 serde = { version = "1.0", features = ["derive"] }
 thiserror = { version = "2.0" }
 tokio = { version = "1.54", features = ["full"] }
 tracing = { version = "0.1" }
-rstest = { version = "0.28" }
+rstest = { version = "0.29" }
 googletest = { version = "0.14" }

@@ -1,5 +1,25 @@
 > The design consist of multiple optional parts but shared through a common plugin system
 
+## Handle dependencies via `adaliszk-anymap` container
+
+A `Container` is a type-keyed map (backed by [anymap3](https://crates.io/crates/anymap3)) holding
+one provider per type. A dependency is provided one of three Laravel-style ways:
+
+```rust
+use adaliszk_anymap::{Container, Resolvable};
+
+#[derive(Resolvable, Clone)]
+struct Config { token: String }
+
+let mut container = Container::default();
+
+container.bind(Config { token: "secret".to_owned() });
+container.bind_with(|_| Config { token: "fresh".to_owned() });
+container.singleton_with(|_| Config { token: "once".to_owned() });
+
+let config: Option<Config> = container.resolve::<Config>();
+```
+
 # Main configuration via "prelude":
 
 All applications need a configuration, logging, and monitoring, which could be set up

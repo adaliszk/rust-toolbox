@@ -1,0 +1,45 @@
+error[E0277]: `Rc<String>` cannot be sent between threads safely
+ --> tests/examples/not_send.rs:5:10
+  |
+5 | #[derive(Resolvable, Clone)]
+  |          ^^^^^^^^^^ `Rc<String>` cannot be sent between threads safely
+  |
+  = help: within `NotSend`, the trait `Send` is not implemented for `Rc<String>`
+note: required because it appears within the type `NotSend`
+ --> tests/examples/not_send.rs:8:5
+  |
+6 | struct NotSend
+7 | {
+8 |     value: Rc<String>,
+  |     ^^^^^^^^^^^^^^^^^ required by this field
+note: required by a bound in `Container::make`
+ --> $WORKSPACE/adaliszk-anymap/source/container.rs
+  |
+  | impl Container
+...
+  |     pub fn make<T: Any + Send + Sync>(&self) -> Option<T>
+  |                          ^^^^ required by this bound in `Container::make`
+  = note: this error originates in the derive macro `Resolvable` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0277]: `Rc<String>` cannot be shared between threads safely
+ --> tests/examples/not_send.rs:5:10
+  |
+5 | #[derive(Resolvable, Clone)]
+  |          ^^^^^^^^^^ `Rc<String>` cannot be shared between threads safely
+  |
+  = help: within `NotSend`, the trait `Sync` is not implemented for `Rc<String>`
+note: required because it appears within the type `NotSend`
+ --> tests/examples/not_send.rs:8:5
+  |
+6 | struct NotSend
+7 | {
+8 |     value: Rc<String>,
+  |     ^^^^^^^^^^^^^^^^^ required by this field
+note: required by a bound in `Container::make`
+ --> $WORKSPACE/adaliszk-anymap/source/container.rs
+  |
+  | impl Container
+...
+  |     pub fn make<T: Any + Send + Sync>(&self) -> Option<T>
+  |                                 ^^^^ required by this bound in `Container::make`
+  = note: this error originates in the derive macro `Resolvable` (in Nightly builds, run with -Z macro-backtrace for more info)

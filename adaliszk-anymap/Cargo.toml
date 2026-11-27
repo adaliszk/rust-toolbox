@@ -1,0 +1,21 @@
+[package]
+name = "adaliszk-anymap"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Laravel style dependency-injection-friendly wrapper over anymap3: a type-keyed container with a Resolvable derive."
+keywords = ["anymap", "container", "dependency-injection", "typemap", "di"]
+categories = ["data-structures", "rust-patterns"]
+repository = "https://codeberg.org/adaliszk/rust-toolbox"
+readme = "README.md"
+
+[lib]
+path = "source/lib.rs"
+
+[dependencies]
+adaliszk-anymap-macros = { path = "./macros", version = "0.1.0" }
+anymap3 = { version = "1.1" }
+
+[package.metadata.release]
+shared-version = "anymap"

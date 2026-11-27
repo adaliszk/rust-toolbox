@@ -1,0 +1,26 @@
+[package]
+name = "adaliszk-anymap-macros"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Procedural-macro companion for adaliszk-anymap (the Resolvable derive)."
+keywords = ["macros", "proc-macro", "anymap", "derive", "di"]
+categories = ["development-tools::procedural-macro-helpers"]
+repository = "https://codeberg.org/adaliszk/rust-toolbox"
+readme = "README.md"
+
+[lib]
+proc-macro = true
+path = "source/lib.rs"
+
+[dependencies]
+quote = "1.0"
+syn = "3.0"
+
+[dev-dependencies]
+adaliszk-anymap = { path = ".." }
+trybuild = "1.0"
+
+[package.metadata.release]
+shared-version = "anymap"

@@ -14,7 +14,7 @@ readme = "README.md"
 path = "source/lib.rs"
 
 [dependencies]
-adaliszk-prelude-macros = { path = "./macros", version = "0.2.0" }
+adaliszk-prelude-macros = { path = "./macros", version = "0.3.0" }
 glob = { version = "0.3" }
 serde.workspace = true
 serde_json = { version = "1.0" }

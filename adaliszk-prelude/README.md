@@ -37,7 +37,7 @@ struct ApplicationConfig {
 let config: ApplicationConfig = parse_files(&["config.yaml".into()]).expect("parse config");
 
 // Initialize the tracing using the config:
-let guard = init_tracing(workspace_crates!(), &config.logging);
+let guard = init_tracing(&workspace_crates!(), &config.logging);
 ```
 
 ## License & Disclosure

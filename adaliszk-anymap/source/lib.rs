@@ -19,8 +19,7 @@
 //! let mut container = Container::default();
 //! container.bind(Something("foo".to_owned()));
 //!
-//! let resolved: Option<Something> = container.resolve::<Something>();
-//! assert!(resolved.is_some());
+//! let resolved: Something = container.require::<Something>().expect("bound above");
 //! ```
 
 /// Re-export of [`anymap3`](https://crates.io/crates/anymap3), the backing store.

@@ -1,63 +1,53 @@
 // SPDX-FileCopyrightText: 2026, Ádám Liszkai and Contributors
 // SPDX-License-Identifier: MPL-2.0
 
-use adaliszk_console::{
-    ConsoleArgs, ConsoleHandler, ConsoleOptions, ConsoleRegistration, ConsoleResult, console,
-};
-use clap::Command;
+use adaliszk_anymap::Resolvable;
+use adaliszk_console::{console_args, console_command, resolve_console, CommandResult};
 use serde::Deserialize;
 use std::sync::Mutex;
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Resolvable, Clone)]
 struct TestConfig
 {
     token: String,
 }
 
-/// Helper to track if handle was called or not
-static RECEIVED: Mutex<Option<String>> = Mutex::new(None);
-
-#[derive(ConsoleArgs)]
-struct TestCommand;
-
-#[console(name = "test")]
-impl ConsoleHandler<TestConfig> for TestCommand
+#[console_args]
+struct RecordArgs
 {
-    async fn handle(&self, config: &TestConfig) -> ConsoleResult
-    {
-        *RECEIVED.lock().unwrap() = Some(config.token.clone());
-        Ok(())
-    }
+    #[arg(long)]
+    shout: bool,
 }
 
-/// End-to-end: the global `--config` is parsed from a file and passed to the handler
-#[tokio::test]
-async fn dispatch_passes_parsed_config_to_handler()
+/// Helper to capture what the handler received.
+static RECEIVED: Mutex<Option<String>> = Mutex::new(None);
+
+/// Records the config token and the parsed flag it received
+#[console_command(name = "record", args = RecordArgs)]
+async fn record_command(config: &TestConfig, args: &RecordArgs) -> CommandResult
 {
-    let registration = inventory::iter::<&'static dyn ConsoleRegistration>
-        .into_iter()
-        .find(|registration| registration.signature() == "test")
-        .expect("record command is registered");
+    let mut token = config.token.clone();
+    if args.shout {
+        token = token.to_uppercase();
+    }
+    *RECEIVED.lock().unwrap() = Some(token);
+    Ok(())
+}
 
-    let cli = ConsoleOptions::augment_args(Command::new("app"));
-    let cli =
-        cli.subcommand(registration.augment_command(Command::new(registration.signature())));
-
-    let config_path = "tests/fixtures/dispatch.yaml";
-    let matches = cli.get_matches_from([
+/// End-to-end: argv is parsed, the config is loaded from the `--config` file, both are bound
+/// into the container, and the handler resolves them by type.
+#[tokio::test]
+async fn dispatch_binds_config_and_parsed_args_into_the_container()
+{
+    let mut app = resolve_console(
         "app",
-        "--config",
-        config_path,
-        "test",
-        "--config",
-        config_path,
-    ]);
-    let (_, params) = matches.subcommand().expect("a subcommand was matched");
+        ["app", "--config", "tests/fixtures/dispatch.yaml", "record", "--shout"],
+    )
+    .expect("the command resolves");
 
-    registration
-        .resolve(params)
-        .await
-        .expect("dispatch succeeds");
+    // `load_config` also binds the loaded config into `app.container`:
+    let _config: TestConfig = app.load_config().expect("the fixture parses");
+    app.resolve().await.expect("dispatch succeeds");
 
-    assert_eq!(RECEIVED.lock().unwrap().as_deref(), Some("secret"));
+    assert_eq!(RECEIVED.lock().unwrap().as_deref(), Some("SECRET"));
 }

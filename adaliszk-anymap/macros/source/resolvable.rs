@@ -17,7 +17,7 @@ pub fn expand(item: TokenStream) -> TokenStream
                 container: &::adaliszk_anymap::Container,
             ) -> ::core::option::Option<Self> {
                 ::core::option::Option::or_else(
-                    container.make::<Self>(), || container.get::<Self>().cloned(),
+                    container.make::<Self>(), || container.borrow::<Self>().cloned(),
                 )
             }
         }

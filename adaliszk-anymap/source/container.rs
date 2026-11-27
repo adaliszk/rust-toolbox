@@ -5,7 +5,6 @@ use std::any::{Any, TypeId};
 use std::collections::HashMap;
 use std::sync::OnceLock;
 
-/// Builds a type-erased value from the container on demand.
 type Factory = Box<dyn Fn(&Container) -> Box<dyn Any + Send + Sync> + Send + Sync>;
 
 /// Type-keyed container holding at most one provider per type.
@@ -21,7 +20,13 @@ pub struct Container
 
 impl Container
 {
-    /// Bind a ready value, replacing any previous value of the same type. Chainable.
+    /// Whether a value or factory is bound for type `T`.
+    pub fn contains<T: Any + Send + Sync>(&self) -> bool
+    {
+        self.instances.get::<T>().is_some() || self.factories.contains_key(&TypeId::of::<T>())
+    }
+
+    /// Bind a ready value, replacing any previous value of the same type.
     pub fn bind<T: Any + Send + Sync>(&mut self, value: T) -> &mut Self
     {
         self.instances.insert(value);
@@ -32,8 +37,6 @@ impl Container
     ///
     /// The closure receives the container, so it can resolve its own dependencies. A
     /// factory takes precedence over a bound value of the same type.
-    ///
-    /// Chainable.
     pub fn bind_with<T, F>(&mut self, factory: F) -> &mut Self
     where
         T: Any + Send + Sync,
@@ -49,10 +52,7 @@ impl Container
     /// Bind a factory that builds `T` once, lazily, then caches it for every later resolve.
     ///
     /// The factory runs on the first resolve and never again; subsequent resolves clone the
-    /// cached value (so `T` must be `Clone`). For a shared instance, make `T` an `Arc<_>`:
-    /// the cached `Arc` is cloned, so every resolve sees the same underlying value.
-    ///
-    /// Chainable.
+    /// cached value (so `T` must be `Clone`).
     pub fn singleton_with<T, F>(&mut self, factory: F) -> &mut Self
     where
         T: Any + Send + Sync + Clone,
@@ -61,48 +61,61 @@ impl Container
         let cache: OnceLock<T> = OnceLock::new();
         self.factories.insert(
             TypeId::of::<T>(),
-            Box::new(move |container| Box::new(cache.get_or_init(|| factory(container)).clone())),
+            Box::new(move |container| {
+                Box::new(cache.get_or_init(|| factory(container)).clone())
+            }),
         );
         self
     }
 
-    /// Whether a value or factory is bound for type `T`.
-    pub fn contains<T: Any + Send + Sync>(&self) -> bool
+    /// Borrow the bound instance of type `T`, if one was bound with [`bind`](Container::bind).
+    ///
+    /// Factory-provided values are built per call, so there is nothing stored to borrow — use
+    /// [`require`](Container::require) (or [`make`](Container::make)) for those. This is the
+    /// zero-clone access, and the only access to a non-`Clone` bound value.
+    pub fn borrow<T: Any + Send + Sync>(&self) -> Option<&T>
     {
-        self.instances.get::<T>().is_some() || self.factories.contains_key(&TypeId::of::<T>())
+        self.instances.get::<T>()
     }
 
     /// Build an owned `T` from its factory, if one is bound. Returns `None` otherwise.
     ///
-    /// Unlike cloning a bound value, this needs no `Clone` bound, so it works for foreign
-    /// types the application wires up with [`bind_with`](Container::bind_with).
+    /// This needs no `Clone`, so it works for foreign types the application wires up with
+    /// [`bind_with`](Container::bind_with).
     pub fn make<T: Any + Send + Sync>(&self) -> Option<T>
     {
         let factory = self.factories.get(&TypeId::of::<T>())?;
         factory(self).downcast::<T>().ok().map(|value| *value)
     }
 
-    /// Borrow the bound value of type `T`, if one was bound with [`bind`](Container::bind).
+    /// Resolve a [`Resolvable`] type, or return a [`ResolveError`] naming it.
     ///
-    /// This never runs a factory; use [`make`](Container::make) or
-    /// [`resolve`](Container::resolve) for factory-built instances.
-    pub fn get<T: Any + Send + Sync>(&self) -> Option<&T>
+    /// For an optional dependency, use `require::<T>().ok()`.
+    pub fn require<T: Resolvable>(&self) -> Result<T, ResolveError>
     {
-        self.instances.get::<T>()
+        T::resolve(self).ok_or_else(|| ResolveError {
+            dependency: core::any::type_name::<T>(),
+        })
     }
+}
 
-    /// Resolve a [`Resolvable`] type out of this container.
-    pub fn resolve<T: Resolvable>(&self) -> Option<T>
-    {
-        T::resolve(self)
-    }
+/// A dependency that could not be resolved from a [`Container`].
+#[derive(Debug, thiserror::Error)]
+#[error("could not resolve `{dependency}`")]
+pub struct ResolveError
+{
+    /// The type that was requested.
+    pub dependency: &'static str,
 }
 
 impl Default for Container
 {
     fn default() -> Self
     {
-        Self { instances: anymap3::Map::new(), factories: HashMap::new() }
+        Self {
+            instances: anymap3::Map::new(),
+            factories: HashMap::new(),
+        }
     }
 }
 

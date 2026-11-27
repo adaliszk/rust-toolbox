@@ -3,36 +3,40 @@
 //!
 //! # AdaLiszk Console
 //!
-//! A small command framework over [`clap`] and [`inventory`]. Commands register themselves at
-//! compile time, so a binary discovers them without a central list, while the commands receive
-//! the application's parsed configuration from a common struct declared in the user-space.
+//! The clap front-end for [`adaliszk-commands`](adaliszk_commands): it builds the CLI from the
+//! registered commands, parses the process arguments, loads the configuration, and binds both
+//! into the dependency-injection [`Container`] that the matched command resolves from.
 //!
 //! ## Flow
 //!
-//! 1. Declare a configuration type in your foundation crate.
-//! 2. Implement [`ConsoleHandler`] on a command and annotate it with [`console`].
-//! 3. Call [`resolve_console`] in `main`, then [`ResolvedConsoleCommand::resolve`].
+//! 1. Declare commands with [`console_command`] (a drop-in for `adaliszk-commands`'
+//!    [`command`]) — parameters resolved from the container by type, and `args = TheArgs`
+//!    links the command's flags.
+//! 2. Declare each command's flags as a plain struct with [`console_args`] — the attribute
+//!    derives `clap::Args`, `Resolvable`, and `Clone`.
+//! 3. Call [`resolve_console`] in `main`, load the config (bound into the carried
+//!    [`Container`] for you), add any services, then [`ResolvedConsoleCommand::resolve`].
 //!
-//! The [`console`] macro documents the command-authoring side in detail.
+//! The generated derives expand to [`clap`](https://crates.io/crates/clap) and
+//! [`adaliszk-anymap`](https://crates.io/crates/adaliszk-anymap) paths, so both are expected
+//! as direct dependencies of the application alongside this crate.
 //!
 
-/// Re-export of [`inventory`](https://crates.io/crates/inventory)
-pub use inventory;
+/// Re-exports of the command registration layer from
+/// [`adaliszk-commands`](https://crates.io/crates/adaliszk-commands).
+pub use adaliszk_commands::{command, AsyncError, CommandRegistration, CommandResult, Container};
 
-/// Re-export of [`clap`](https://crates.io/crates/clap)
-pub use clap;
+/// Re-exports of the macro needed to register console commands:
+pub use adaliszk_console_macros::console_command;
 
-/// Re-export of [`clap::Args`](https://docs.rs/clap/4.6.9/clap/trait.Args.html)
-pub use clap::Args as ConsoleArgs;
-
-/// Re-export of [`async_trait`](https://crates.io/crates/async-trait)
-pub use async_trait::async_trait as Async;
-
-mod types;
-pub use types::*;
+/// Re-exports of the macro needed to register console arguments:
+pub use adaliszk_console_macros::console_args;
 
 mod console;
 pub use console::*;
+
+#[doc(hidden)] // Used by the macro-generated registrations only
+pub use inventory;
 
 mod prelude;
 pub use prelude::*;

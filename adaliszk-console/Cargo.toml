@@ -4,7 +4,7 @@ version = "0.2.2"
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
-description = "A small command framework over clap and inventory with compile-time registration."
+description = "Clap front-end for adaliszk-commands: builds the CLI, parses arguments, and binds them into the DI container."
 keywords = ["cli", "clap", "inventory", "command", "console"]
 categories = ["command-line-interface", "development-tools"]
 repository = "https://codeberg.org/adaliszk/rust-toolbox"
@@ -14,16 +14,16 @@ readme = "README.md"
 path = "source/lib.rs"
 
 [dependencies]
-adaliszk-prelude = { path = "../adaliszk-prelude", version = "0.2.0" }
+adaliszk-commands = { path = "../adaliszk-commands", version = "0.1.0" }
 adaliszk-console-macros = { path = "./macros", version = "0.2.2" }
-async-trait.workspace = true
+adaliszk-prelude = { path = "../adaliszk-prelude", version = "0.2.0" }
 clap = { version = "4.6", features = ["derive", "env"] }
 inventory.workspace = true
 serde.workspace = true
-thiserror.workspace = true
-tracing.workspace = true
 
 [dev-dependencies]
+# The `Resolvable` derive (via #[console_args]) expands to `::adaliszk_anymap::` paths:
+adaliszk-anymap = { path = "../adaliszk-anymap" }
 rstest.workspace = true
 googletest.workspace = true
 clap = { version = "4.6", features = ["derive"] }

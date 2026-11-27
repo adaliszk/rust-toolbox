@@ -1,61 +1,103 @@
 // SPDX-FileCopyrightText: 2026, Ádám Liszkai and Contributors
 // SPDX-License-Identifier: MPL-2.0
 
+use adaliszk_anymap::Resolvable;
 use adaliszk_console::{
-    ConsoleHandler, ConsoleArgs, ConsoleHelp, ConsoleRegistration, ConsoleResult, console,
+    console_args, console_command, resolve_console, CommandResult, ConsoleRegistration,
 };
-use inventory; // <- Or adaliszk_console::inventory;
 use serde::Deserialize;
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Resolvable, Clone)]
 struct AppConfig; // <- Normally implemented in the project's API/Prelude/Foundation
 
-#[derive(ConsoleArgs)]
-struct SimpleCommand; // <- Normally implemented in any of the project's workspaces
-
-#[console(name = "simple")]
-impl ConsoleHandler<AppConfig> for SimpleCommand
+#[console_args]
+struct SimpleArgs
 {
-    async fn handle(&self, _config: &AppConfig) -> ConsoleResult
-    {
-        Ok(())
-    }
+    #[arg(long)]
+    force: bool,
+}
+
+/// Runs the simple command
+#[console_command(args = SimpleArgs)]
+async fn simple(_config: &AppConfig, args: &SimpleArgs) -> CommandResult
+{
+    assert!(args.force, "the parsed flag reaches the handler");
+    Ok(())
+}
+
+/// A command with no arguments attached still resolves
+#[console_command]
+async fn bare(_config: &AppConfig) -> CommandResult
+{
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_command_with_args_receives_the_parsed_flags()
+{
+    let mut app = resolve_console("app", ["app", "simple", "--force"])
+        .expect("the command resolves");
+
+    app.container.bind(AppConfig);
+    app.resolve().await.expect("dispatch succeeds");
+}
+
+#[tokio::test]
+async fn a_command_without_args_only_needs_the_config()
+{
+    let mut app = resolve_console("app", ["app", "bare"]).expect("the command resolves");
+
+    app.container.bind(AppConfig);
+    app.resolve().await.expect("dispatch succeeds");
+}
+
+#[derive(Resolvable, Clone)]
+struct Service
+{
+    id: u32,
+}
+
+/// Uses a service bound by the application, not parsed from the CLI
+#[console_command]
+async fn serviced(_config: &AppConfig, service: &Service) -> CommandResult
+{
+    assert_eq!(service.id, 7, "the factory-built service reaches the handler");
+    Ok(())
+}
+
+#[tokio::test]
+async fn an_application_bound_service_reaches_the_handler()
+{
+    let mut app = resolve_console("app", ["app", "serviced"]).expect("the command resolves");
+
+    app.container.bind(AppConfig);
+    app.container.singleton_with(|_| Service { id: 7 });
+    app.resolve().await.expect("dispatch succeeds");
 }
 
 #[test]
-fn command_registers_in_inventory()
+fn a_console_registration_points_to_its_command()
 {
-    let registered = inventory::iter::<&'static dyn ConsoleRegistration>
+    let registration = adaliszk_console::inventory::iter::<&'static dyn ConsoleRegistration>
         .into_iter()
-        .any(|registration| registration.signature() == "simple");
+        .find(|registration| registration.command_name() == "simple")
+        .expect("the args are registered");
 
-    assert_eq!(
-        <SimpleCommand as ConsoleHelp>::DESCRIPTION,
-        env!("CARGO_PKG_DESCRIPTION")
-    );
-    assert!(registered);
+    let command = registration.command();
+    assert_eq!(command.name(), "simple");
+    assert_eq!(command.about(), Some("Runs the simple command"));
 }
 
-#[derive(ConsoleArgs)]
-struct DescribedCommand; // <- Normally used when multiple commands implemented per workspace
-
-#[console(
-    name = "describe",
-    about = "this shows up instead of the CARGO_PKG_DESCRIPTION"
-)]
-impl ConsoleHandler<AppConfig> for DescribedCommand
+#[tokio::test]
+async fn a_missing_config_binding_is_an_error()
 {
-    async fn handle(&self, _config: &AppConfig) -> ConsoleResult
-    {
-        Ok(())
-    }
-}
+    #[derive(Resolvable, Clone)]
+    struct OtherConfig;
 
-#[test]
-fn command_uses_custom_about_description()
-{
-    assert_eq!(
-        <DescribedCommand as ConsoleHelp>::DESCRIPTION,
-        "this shows up instead of the CARGO_PKG_DESCRIPTION"
-    );
+    let mut app = resolve_console("app", ["app", "bare"]).expect("the command resolves");
+
+    // The handler wants `AppConfig`, but only `OtherConfig` gets bound:
+    app.container.bind(OtherConfig);
+    let result = app.resolve().await;
+    assert!(result.is_err());
 }

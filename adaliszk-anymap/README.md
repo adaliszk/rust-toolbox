@@ -31,7 +31,7 @@ container.bind_with(|_| Config { token: "fresh".to_owned() });
 container.singleton_with(|_| Config { token: "once".to_owned() });
 
 // Use the value:
-let config: Option<Config> = container.resolve::<Config>();
+let config: Config = container.require::<Config>().expect("bound above");
 ```
 
 ## Why do this?
@@ -46,8 +46,9 @@ macro to facilitate a Laravel-style mental logic.
 
 Licensed under the Mozilla Public License 2.0 (MPL-2.0).
 
-Development was done with LLM as a search engine and debugger (meaning it is for learning only),
-NO SOURCE LINES where generated or changed without direct human decisions and work.
+The initial version was LLM generated, but iterations and refinements from there only involves
+LLM as a search engine and debugger (meaning it is for learning only).
 
-Contributions expected to follow the same **No-Automated-LLM Contributions** policy with strict
+Contributions expected to follow **No-Automated-LLM Contributions** policy with strict
 limitations to retain the quality and understanding!
+

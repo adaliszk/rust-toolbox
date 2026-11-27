@@ -1,0 +1,5 @@
+error: #[console_args] takes no options; link the struct to its command with #[console_command(args = TheArgs)]
+ --> tests/examples/args_with_options.rs:4:16
+  |
+4 | #[console_args("example")]
+  |                ^^^^^^^^^

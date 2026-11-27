@@ -1,0 +1,26 @@
+[package]
+name = "adaliszk-commands"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Clap-free command registration wired through the adaliszk-anymap dependency-injection container."
+keywords = ["command", "inventory", "dependency-injection", "di", "plugin"]
+categories = ["development-tools", "rust-patterns"]
+repository = "https://codeberg.org/adaliszk/rust-toolbox"
+readme = "README.md"
+
+[lib]
+path = "source/lib.rs"
+
+[dependencies]
+adaliszk-anymap = { path = "../adaliszk-anymap", version = "0.1.0" }
+adaliszk-commands-macros = { path = "./macros", version = "0.1.0" }
+async-trait.workspace = true
+inventory.workspace = true
+
+[dev-dependencies]
+tokio.workspace = true
+
+[package.metadata.release]
+shared-version = "commands"

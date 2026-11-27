@@ -4,8 +4,8 @@ version = "0.2.2"
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
-description = "Procedural-macro companion for adaliszk-console."
-keywords = ["macros", "proc-macro", "cli", "command", "console"]
+description = "Procedural-macro companion for adaliszk-console (the console_args attribute)."
+keywords = ["macros", "proc-macro", "cli", "clap", "console"]
 categories = ["development-tools::procedural-macro-helpers"]
 repository = "https://codeberg.org/adaliszk/rust-toolbox"
 readme = "README.md"
@@ -15,12 +15,16 @@ proc-macro = true
 path = "source/lib.rs"
 
 [dependencies]
-quote = { version = "1.0" }
+proc-macro2 = "1.0"
+quote = "1.0"
 syn = { version = "3.0", features = ["full"] }
 
 [dev-dependencies]
+# The doctests expand to these crates' paths, like any application using the macros:
+adaliszk-anymap = { path = "../../adaliszk-anymap" }
+adaliszk-commands = { path = "../../adaliszk-commands" }
 adaliszk-console = { path = ".." }
-googletest.workspace = true
+clap = { version = "4.6", features = ["derive"] }
 trybuild = "1.0"
 
 [package.metadata.release]

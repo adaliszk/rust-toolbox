@@ -22,7 +22,7 @@ fn binds_and_reads_back_by_type()
     let mut container = Container::default();
     container.bind(Config { token: "abc".to_owned() });
 
-    assert_eq!(container.get::<Config>().map(|c| c.token.as_str()), Some("abc"));
+    assert_eq!(container.borrow::<Config>().map(|c| c.token.as_str()), Some("abc"));
     assert!(container.contains::<Config>());
     assert!(!container.contains::<Service>());
 }
@@ -33,7 +33,7 @@ fn resolvable_derive_clones_bound_value_out()
     let mut container = Container::default();
     container.bind(Service { id: 7 });
 
-    assert_eq!(container.resolve::<Service>(), Some(Service { id: 7 }));
+    assert_eq!(container.require::<Service>().ok(), Some(Service { id: 7 }));
 }
 
 #[test]
@@ -41,7 +41,17 @@ fn missing_binding_resolves_to_none()
 {
     let container = Container::default();
 
-    assert_eq!(container.resolve::<Service>(), None);
+    assert_eq!(container.require::<Service>().ok(), None);
+}
+
+#[test]
+fn require_names_the_dependency_in_the_error()
+{
+    let container = Container::default();
+
+    let error = container.require::<Service>().unwrap_err();
+    assert!(error.to_string().contains("could not resolve"));
+    assert!(error.to_string().contains("Service"));
 }
 
 #[test]
@@ -50,7 +60,7 @@ fn bind_with_builds_the_value_from_a_factory()
     let mut container = Container::default();
     container.bind_with(|_| Service { id: 42 });
 
-    assert_eq!(container.resolve::<Service>(), Some(Service { id: 42 }));
+    assert_eq!(container.require::<Service>().ok(), Some(Service { id: 42 }));
     assert_eq!(container.make::<Service>(), Some(Service { id: 42 }));
 }
 
@@ -62,8 +72,8 @@ fn factory_runs_on_every_resolve()
     let mut container = Container::default();
     container.bind_with(|_| Service { id: CALLS.fetch_add(1, Ordering::SeqCst) });
 
-    assert_eq!(container.resolve::<Service>(), Some(Service { id: 0 }));
-    assert_eq!(container.resolve::<Service>(), Some(Service { id: 1 }));
+    assert_eq!(container.require::<Service>().ok(), Some(Service { id: 0 }));
+    assert_eq!(container.require::<Service>().ok(), Some(Service { id: 1 }));
 }
 
 #[test]
@@ -84,10 +94,10 @@ fn factory_can_pull_its_own_dependencies_from_the_container()
     let mut container = Container::default();
     container.bind(Db { url: "postgres://x".to_owned() });
     container.bind_with(|container| Repo {
-        url: container.get::<Db>().unwrap().url.clone(),
+        url: container.borrow::<Db>().unwrap().url.clone(),
     });
 
-    assert_eq!(container.resolve::<Repo>().unwrap().url, "postgres://x");
+    assert_eq!(container.require::<Repo>().unwrap().url, "postgres://x");
 }
 
 #[test]
@@ -97,7 +107,7 @@ fn factory_takes_precedence_over_a_bound_value()
     container.bind(Service { id: 1 });
     container.bind_with(|_| Service { id: 2 });
 
-    assert_eq!(container.resolve::<Service>(), Some(Service { id: 2 }));
+    assert_eq!(container.require::<Service>().ok(), Some(Service { id: 2 }));
 }
 
 #[test]
@@ -111,8 +121,8 @@ fn singleton_with_builds_once_and_caches()
         Service { id: 99 }
     });
 
-    assert_eq!(container.resolve::<Service>(), Some(Service { id: 99 }));
-    assert_eq!(container.resolve::<Service>(), Some(Service { id: 99 }));
+    assert_eq!(container.require::<Service>().ok(), Some(Service { id: 99 }));
+    assert_eq!(container.require::<Service>().ok(), Some(Service { id: 99 }));
     assert_eq!(CALLS.load(Ordering::SeqCst), 1);
 }
 

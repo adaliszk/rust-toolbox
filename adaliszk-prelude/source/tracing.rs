@@ -17,7 +17,7 @@ pub enum TracingError
 }
 
 pub fn init_tracing(
-    namespaces: Vec<String>,
+    namespaces: &[String],
     config: &LoggingConfig,
 ) -> Result<WorkerGuard, TracingError>
 {

@@ -1,15 +1,20 @@
 > [!WARNING]
-> Depend on [`adaliszk-console`](https://crates.io/crates/adaliszk-console) instead. The console
-> re-exports every macro from here, so you never name this crate directly.
+> Depend on [`adaliszk-console`](https://crates.io/crates/adaliszk-console) instead.
+> The console re-exports every macro from here, so you never name this crate directly.
 
 ## What it provides
 
-`#[console(name = "...", about = "...")]`
+`#[console_command(name = "...", about = "...", args = TheArgs)]`
 
-An attribute placed on a `ConsoleHandler<CONFIG>` implementation. It registers the command in
-[`inventory`](https://docs.rs/inventory), bridges the handler to the internal registration, and
-reads the application config for you. The `about` option sets the help text, falling back to
-`CARGO_PKG_DESCRIPTION` when omitted.
+A drop-in replacement for `adaliszk-commands`' `#[command]` attribute (which it applies under
+the hood, passing `name` and `about` through). The optional `args = TheArgs` links the command's
+flags: the console contributes the struct's flags to the clap subcommand and binds the parsed
+value into the dependency-injection container.
+
+`#[console_args]`
+
+Attaches `#[derive(clap::Args, Resolvable, Clone)]` to an arguments struct, so none of them are
+repeated at every declaration.
 
 ## License & Disclosure
 

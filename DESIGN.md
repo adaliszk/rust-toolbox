@@ -5,30 +5,41 @@
 The idea is to support multiple type of apps, on a high level:
 
 ```
-CLI
+CLI with commands
 └─ adaliszk-console  ........ clap shell: CLI build, parse, bind into container
+   ├─ adaliszk-prelude  ..... parses configurations and initializes logging
    ├─ adaliszk-commands  .... command inventory with Dependency resolution
    │  └─ adaliszk-anymap  ... command dependencies: resolves signature structs
-   ├─ adaliszk-anymap  ...... clap dependencies: resolves application and clap structs
-   └─ adaliszk-prelude  ..... parses configurations and initializes logging
+   └─ adaliszk-anymap  ...... clap dependencies: resolves application and clap structs
+```
+
+```
+Bot with Async Events
+└─ adaliszk-console  ........ clap shell: CLI build, parse, bind into container
+   ├─ adaliszk-prelude  ..... parses configurations and initializes logging
+   ├─ adaliszk-events  ...... event inventory with Dependency resolution
+   │  └─ adaliszk-anymap  ... event dependencies: resolves signature structs
+   └─ adaliszk-anymap  ...... clap dependencies: resolves application and clap structs
 ```
 
 # Handle dependencies via `adaliszk-anymap` container
 
-A `Container` is a type-keyed map (backed by [anymap3](https://crates.io/crates/anymap3)) holding
-one provider per type. A dependency is provided one of three Laravel-style ways:
+A `Container` is a type-keyed map (backed by [anymap3](https://crates.io/crates/anymap3))
+holding one provider per type. A dependency is provided one of three Laravel-style ways:
 
 ```rust
 use adaliszk_anymap::{Container, Resolvable};
 
 #[derive(Resolvable, Clone)]
-struct Config { token: String }
+struct Config {
+    token: String
+}
 
-let mut container = Container::default();
+let mut container = Container::default ();
 
 container.bind(Config { token: "secret".to_owned() });
-container.bind_with(|_| Config { token: "fresh".to_owned() });
-container.singleton_with(|_| Config { token: "once".to_owned() });
+container.bind_with( | _ | Config { token: "fresh".to_owned() });
+container.singleton_with( | _ | Config { token: "once".to_owned() });
 
 let config: Config = container.require::<Config>().expect("bound above");
 ```
@@ -53,10 +64,10 @@ struct ApplicationConfig {
 }
 
 // Parse one or more config files (format picked by extension) into the struct:
-let config: ApplicationConfig = parse_files(&["config.yaml".into()]).expect("parse config");
+let config: ApplicationConfig = parse_files( & ["config.yaml".into()]).expect("parse config");
 
 // Initialize the tracing using the config:
-let guard = init_tracing(&workspace_crates!(), &config.logging);
+let guard = init_tracing( & workspace_crates!(), & config.logging);
 ```
 
 The particular application is expected to be split into multiple local crates, where
@@ -113,4 +124,50 @@ arguments, and binds the config plus the parsed args into the container.
 
        app.resolve().await
    }
+   ```
+
+# Event dispatch and handling using "events"
+
+Wire up events and listeners with tokio behind the scenes in a simple way:
+
+1. Declare events that could be listened to:
+   ```rust
+   use adaliszk_events::event;
+
+   #[event] // <- derives Dispatchable, Resolvable, and Clone
+   struct MessageArrived
+   {
+       channel_id: u64,
+       user_id: u64,
+       message: String,
+   }
+   ```
+
+2. Declare your listener in anywhere so that [inventory](https://crates.io/crates/inventory)
+   could collect the handlers for each event:
+   ```rust
+   use adaliszk_events::{EventResult, listen};
+   use project_foundation::{ApplicationConfig, MessageArrived};
+   
+   #[listen(event = MessageArrived)]
+   async fn on_message_arrived(event: &MessageArrived) -> EventResult
+   {
+       todo!()
+   }
+   ```
+
+3. Resolve the dispatcher once in `main` — it subscribes every listener on a tokio broadcast
+   channel
+   per event type — then emit events anywhere, fire-and-forget:
+   ```rust
+   use adaliszk_events::resolve_events;
+   use project_foundation::MessageArrived;
+
+   let events = resolve_events();
+
+   let receivers = events.emit(MessageArrived {
+       channel_id: 0,
+       user_id: 0,
+       message: "Example".to_owned(),
+   });
    ```

@@ -75,6 +75,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "adaliszk-events"
+version = "0.1.0"
+dependencies = [
+ "adaliszk-anymap",
+ "adaliszk-events-macros",
+ "async-trait",
+ "inventory",
+ "tokio",
+]
+
+[[package]]
+name = "adaliszk-events-macros"
+version = "0.1.0"
+dependencies = [
+ "adaliszk-anymap",
+ "adaliszk-events",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.10",
+ "tokio",
+ "trybuild",
+]
+
+[[package]]
 name = "adaliszk-prelude"
 version = "0.3.0"
 dependencies = [

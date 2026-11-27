@@ -22,7 +22,7 @@ syn = { version = "3.0", features = ["full"] }
 [dev-dependencies]
 adaliszk-anymap = { path = "../../adaliszk-anymap" } # the Resolvable derive expands to its paths
 adaliszk-commands = { path = ".." }
-trybuild = "1.0"
+trybuild.workspace = true
 
 [package.metadata.release]
 shared-version = "commands"

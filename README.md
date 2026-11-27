@@ -18,15 +18,15 @@ a decade now. Nothing crazy, 99% the official with a tiny tweak here and there.
 
 ## Packages (Crates)
 
-| Name                                               | Type    | Purpose                                          | Crate                                                                                                                              |
-|:---------------------------------------------------|:--------|:-------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------|
-| [`adaliszkfmt`](./adaliszkfmt/README.md)           | CLI     | Drop-in `rustfmt` shim bundling a personal style | [![v](https://img.shields.io/crates/v/adaliszkfmt?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszkfmt)           |
-| [`adaliszk-prelude`](./adaliszk-prelude/README.md) | Library | Configure, Log, and Monitor applications         | [![v](https://img.shields.io/crates/v/adaliszk-prelude?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-prelude) |
-| [`adaliszk-anymap`](./adaliszk-anymap/README.md)   | Library | Type-keyed DI container with factory bindings     | [![v](https://img.shields.io/crates/v/adaliszk-anymap?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-anymap)   |
-| [`adaliszk-console`](./adaliszk-console/README.md) | Library | Inventory for Clap-based CLI applications        | [![v](https://img.shields.io/crates/v/adaliszk-console?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-console) |
-| [`adaliszk-commands`](./adaliszk-commands/README.md) | Library | Clap-free command inventory resolved through DI | [![v](https://img.shields.io/crates/v/adaliszk-commands?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-commands) |
-| `adlaiszk-terminal`                                | Library | _Inventory for Rattatui-based CLI applications_  | —                                                                                                                                  |
-| `adlaiszk-events`                                  | Library | _Inventory for Tokoi-based eventing_             | —                                                                                                                                  |
+| Name                                                 | Type    | Purpose                                          | Crate                                                                                                                                |
+|:-----------------------------------------------------|:--------|:-------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------|
+| [`adaliszkfmt`](./adaliszkfmt/README.md)             | CLI     | Drop-in `rustfmt` shim bundling a personal style | [![v](https://img.shields.io/crates/v/adaliszkfmt?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszkfmt)             |
+| [`adaliszk-anymap`](./adaliszk-anymap/README.md)     | Library | Type-keyed DI container with factory bindings    | [![v](https://img.shields.io/crates/v/adaliszk-anymap?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-anymap)     |
+| [`adaliszk-prelude`](./adaliszk-prelude/README.md)   | Library | Configure, Log, and Monitor applications         | [![v](https://img.shields.io/crates/v/adaliszk-prelude?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-prelude)   |
+| [`adaliszk-console`](./adaliszk-console/README.md)   | Library | Inventory for Clap-based CLI applications        | [![v](https://img.shields.io/crates/v/adaliszk-console?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-console)   |
+| [`adaliszk-commands`](./adaliszk-commands/README.md) | Library | Inventory for Commands resolved through DI       | [![v](https://img.shields.io/crates/v/adaliszk-commands?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-commands) |
+| [`adaliszk-events`](./adaliszk-events/README.md)     | Library | Inventory for event dispatch through DI          | [![v](https://img.shields.io/crates/v/adaliszk-events?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-events)     |
+| `adlaiszk-terminal`                                  | Library | _Inventory for Rattatui-based CLI applications_  | —                                                                                                                                    |
 
 ### Design & Concept
 

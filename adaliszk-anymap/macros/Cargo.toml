@@ -20,7 +20,7 @@ syn = "3.0"
 
 [dev-dependencies]
 adaliszk-anymap = { path = ".." }
-trybuild = "1.0"
+trybuild.workspace = true
 
 [package.metadata.release]
 shared-version = "anymap"

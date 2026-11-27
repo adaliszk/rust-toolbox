@@ -1,0 +1,24 @@
+[package]
+name = "adaliszk-events"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+description = "Event dispatch over inventory-collected listeners, wired through the adaliszk-anymap dependency-injection container."
+keywords = ["events", "inventory", "dependency-injection", "di", "dispatch"]
+categories = ["asynchronous", "rust-patterns"]
+repository = "https://codeberg.org/adaliszk/rust-toolbox"
+readme = "README.md"
+
+[lib]
+path = "source/lib.rs"
+
+[dependencies]
+adaliszk-anymap = { path = "../adaliszk-anymap", version = "0.1.0" }
+adaliszk-events-macros = { path = "./macros", version = "0.1.0" }
+async-trait.workspace = true
+inventory.workspace = true
+tokio.workspace = true
+
+[package.metadata.release]
+shared-version = "events"

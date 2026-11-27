@@ -10,6 +10,8 @@ members = [
     "adaliszk-console",
     "adaliszk-commands/macros",
     "adaliszk-commands",
+    "adaliszk-events/macros",
+    "adaliszk-events",
 ]
 
 [workspace.metadata.release]
@@ -33,3 +35,4 @@ thiserror = { version = "2.0" }
 tokio = { version = "1.54", features = ["full"] }
 rstest = { version = "0.29" }
 googletest = { version = "0.14" }
+trybuild = { version = "1.0" }

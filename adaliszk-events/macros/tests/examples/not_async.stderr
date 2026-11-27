@@ -1,0 +1,13 @@
+error: #[listen] requires an async fn
+  --> tests/examples/not_async.rs:10:1
+   |
+10 | fn on_message(event: &MessageArrived) -> EventResult
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `EventResult`
+ --> tests/examples/not_async.rs:1:38
+  |
+1 | use adaliszk_events::{event, listen, EventResult};
+  |                                      ^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default

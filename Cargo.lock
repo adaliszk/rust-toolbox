@@ -62,7 +62,7 @@ dependencies = [
 
 [[package]]
 name = "adaliszk-console-macros"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "adaliszk-anymap",
  "adaliszk-commands",

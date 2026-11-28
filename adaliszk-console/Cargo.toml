@@ -16,7 +16,7 @@ path = "source/lib.rs"
 [dependencies]
 adaliszk-commands = { path = "../adaliszk-commands", version = "0.1.2" }
 adaliszk-console-macros = { path = "./macros", version = "0.4.1" }
-adaliszk-prelude = { path = "../adaliszk-prelude", version = "0.3.1" }
+adaliszk-prelude = { path = "../adaliszk-prelude", version = "0.4.0" }
 clap = { version = "4.6", features = ["derive", "env"] }
 inventory.workspace = true
 serde.workspace = true

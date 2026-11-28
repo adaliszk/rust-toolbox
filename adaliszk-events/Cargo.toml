@@ -16,7 +16,7 @@ path = "source/lib.rs"
 [dependencies]
 adaliszk-anymap = { path = "../adaliszk-anymap", version = "0.2.0" }
 adaliszk-events-macros = { path = "./macros", version = "0.1.1" }
-adaliszk-prelude = { path = "../adaliszk-prelude", version = "0.3.1" }
+adaliszk-prelude = { path = "../adaliszk-prelude", version = "0.4.0" }
 async-trait.workspace = true
 inventory.workspace = true
 tokio.workspace = true

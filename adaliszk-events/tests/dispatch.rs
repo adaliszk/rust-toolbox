@@ -226,6 +226,31 @@ async fn a_tagged_listener_subscribes_only_with_its_tag_enabled()
     assert_eq!(telemetry.emit(Measured { _value: 1 }), 2, "the enabled tag adds its listener");
 }
 
+#[event]
+struct SharedByClones
+{
+    _marker: u8,
+}
+
+/// Reached through either dispatcher clone, as they share the channels
+#[listen(event = SharedByClones)]
+async fn on_shared_by_clones(_event: &SharedByClones) -> EventResult
+{
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_cloned_dispatcher_shares_the_channels()
+{
+    let events = resolve_events();
+    let cloned = events.clone();
+
+    assert_eq!(cloned.emit(SharedByClones { _marker: 0 }), 1, "the clone reaches the listener");
+
+    drop(events);
+    assert_eq!(cloned.emit(SharedByClones { _marker: 0 }), 1, "channels outlive the original");
+}
+
 #[tokio::test]
 async fn a_listener_dependency_resolves_through_a_manual_container()
 {

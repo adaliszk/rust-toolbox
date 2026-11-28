@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use crate::{Container, Dispatchable, EventRegistration};
+use std::sync::Arc;
 use tokio::sync::broadcast;
 
 /// The broadcast bus connecting emitted events to their listeners; built by
@@ -12,10 +13,13 @@ use tokio::sync::broadcast;
 /// fire-and-forget: it broadcasts the event and returns immediately; listener failures are
 /// reported to stderr, not to the emitter.
 ///
-/// Dropping the dispatcher closes the channels, which ends the subscriber loops.
+/// Cloning is cheap and shares the channels: an event emitted through any clone reaches the
+/// same listeners. Dropping the last clone closes the channels, which ends the subscriber
+/// loops.
+#[derive(Clone)]
 pub struct EventDispatcher
 {
-    channels: Container,
+    channels: Arc<Container>,
     capacity: usize,
 }
 
@@ -109,7 +113,7 @@ const DEFAULT_CAPACITY: usize = 512;
 
 fn subscribe_listeners(capacity: usize, tags: &[&str]) -> EventDispatcher
 {
-    let mut dispatcher = EventDispatcher { channels: Container::default(), capacity };
+    let mut dispatcher = EventDispatcher { channels: Arc::new(Container::default()), capacity };
     for listener in inventory::iter::<&'static dyn EventRegistration> {
         if listener.tag().is_none_or(|tag| tags.contains(&tag)) {
             listener.subscribe(&mut dispatcher);
@@ -135,11 +139,16 @@ impl EventDispatcher
     #[doc(hidden)] // Called by the macro-generated `EventRegistration::subscribe` only
     pub fn attach<EVENT: Dispatchable>(&mut self, listener: &'static dyn EventRegistration)
     {
-        let sender = match self.channels.borrow::<broadcast::Sender<EVENT>>() {
+        // Wiring happens inside `subscribe_listeners`, before any clone exists, so the
+        // shared container is still uniquely owned and stays mutable here:
+        let channels = Arc::get_mut(&mut self.channels)
+            .expect("attach must run during resolve_events, before the dispatcher is cloned");
+
+        let sender = match channels.borrow::<broadcast::Sender<EVENT>>() {
             Some(sender) => sender.clone(),
             None => {
                 let (sender, _) = broadcast::channel::<EVENT>(self.capacity);
-                self.channels.bind(sender.clone());
+                channels.bind(sender.clone());
                 sender
             }
         };

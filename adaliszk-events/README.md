@@ -1,7 +1,7 @@
 Event dispatch over [`inventory`](https://crates.io/crates/inventory)-collected listeners, wired
 through the [`adaliszk-anymap`](https://crates.io/crates/adaliszk-anymap) dependency-injection
 container. An event is a plain struct; listeners are free `async fn`s discovered at compile time,
-and every listener parameter — the event included — is resolved from the container by type.
+and every listener parameter (the event included) is resolved from the container by type.
 
 ## Installation & Usage
 
@@ -42,9 +42,9 @@ async fn main()
 ```
 
 `resolve_events` wires up the dispatcher with every registered listener subscribed on a [`tokio::sync::broadcast`] channel
-per event type; `emit` is fire-and-forget — it broadcasts the event, returns how many listeners
+per event type; `emit` is fire-and-forget: it broadcasts the event, returns how many listeners
 received it, and the listeners process it on the tokio runtime while the caller moves on. A
-listener may take further parameters (services, config) — they resolve from the container the
+listener may take further parameters (services, config); they resolve from the container the
 same way.
 
 [`tokio::sync::broadcast`]: https://docs.rs/tokio/latest/tokio/sync/broadcast/index.html

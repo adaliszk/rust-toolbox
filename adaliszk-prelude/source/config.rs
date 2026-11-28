@@ -33,14 +33,12 @@ pub enum ParseError
     TooDeep,
 }
 
-/// Maximum mapping nesting depth merged before bailing out, bounding recursion
-/// on deeply nested or hostile config.
 const MAX_MERGE_DEPTH: usize = 64;
 
 /// Parse and layer several config files into one config.
 ///
-/// Each file is parsed according to its extension — `.yaml`/`.yml`, `.json`,
-/// or `.toml` — into a common value tree, then the trees are merged left to
+/// Each file is parsed according to its extension (`.yaml`/`.yml`, `.json`,
+/// or `.toml`) into a common value tree, then the trees are merged left to
 /// right so a later file overrides an earlier one. Mappings are combined
 /// key-by-key (recursing into nested mappings), while scalars and sequences are
 /// replaced wholesale.
@@ -97,14 +95,6 @@ pub fn resolve_paths(pattern: &str) -> Result<Vec<PathBuf>, ParseError>
     Ok(paths)
 }
 
-/// Deep-merge `source` into `target`.
-///
-/// When both sides are mappings, merge them key by key and recurse into keys
-/// they share so nested mappings combine. For every other shape — scalars,
-/// sequences, or a type mismatch — the source replaces the target value.
-///
-/// Recursion is capped at [`MAX_MERGE_DEPTH`] to guard against deeply nested or
-/// hostile config; exceeding it yields [`ParseError::TooDeep`].
 fn merge_into(target: &mut Value, source: Value, depth: usize) -> Result<(), ParseError>
 {
     if depth > MAX_MERGE_DEPTH {
@@ -155,7 +145,6 @@ mod tests
         assert!(matches!(result, Err(ParseError::NoMatches(_))));
     }
 
-    /// Build a mapping nested `depth` levels deep: `{k: {k: {k: ...}}}`.
     fn nested_mapping(depth: usize) -> Value
     {
         let mut value = Value::Null;

@@ -18,7 +18,7 @@ pub type CommandResult = Result<(), AsyncError>;
 #[async_trait]
 pub trait CommandRegistration: Send + Sync
 {
-    /// The command's name — its inventory and dispatch key.
+    /// The command's name: its inventory and dispatch key.
     fn name(&self) -> &'static str;
 
     /// The command's one-line description, from its first `///` line or `about = "..."`.

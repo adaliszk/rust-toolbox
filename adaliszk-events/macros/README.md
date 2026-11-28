@@ -12,8 +12,8 @@ can be handed to `dispatch` and resolved by its listeners from the container.
 `#[listen(event = TheEvent)]`
 
 Registers a free `async fn` in `inventory` as a listener, keyed by the required
-`event = TheEvent` binding. Every parameter is resolved from a `Container` by type — in any
-position — at dispatch.
+`event = TheEvent` binding. Every parameter is resolved from a `Container` by type (in any
+position) at dispatch.
 
 ## License & Disclosure
 

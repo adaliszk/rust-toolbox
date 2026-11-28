@@ -9,7 +9,7 @@ use tokio::sync::broadcast;
 ///
 /// Every `#[listen]` handler collected by `inventory` gets a [`tokio::sync::broadcast`]
 /// receiver on its event's channel, processed on the tokio runtime. [`emit`](Self::emit) is
-/// fire-and-forget — it broadcasts the event and returns immediately; listener failures are
+/// fire-and-forget: it broadcasts the event and returns immediately; listener failures are
 /// reported to stderr, not to the emitter.
 ///
 /// Dropping the dispatcher closes the channels, which ends the subscriber loops.

@@ -78,7 +78,7 @@ that has been declared by the various use-case libraries.
 
 Common use-case is to provide a CLI interface to have various console commands, this is split
 into two crates: `adaliszk-commands` registers clap-free command functions whose parameters are
-resolved from the container, and `adaliszk-console` owns clap — it builds the CLI, parses the
+resolved from the container, and `adaliszk-console` owns clap: it builds the CLI, parses the
 arguments, and binds the config plus the parsed args into the container.
 
 1. Declare your command anywhere so that [inventory](https://crates.io/crates/inventory)
@@ -156,9 +156,9 @@ Wire up events and listeners with tokio behind the scenes in a simple way:
    }
    ```
 
-3. Resolve the dispatcher once in `main` — it subscribes every listener on a tokio broadcast
+3. Resolve the dispatcher once in `main` (it subscribes every listener on a tokio broadcast
    channel
-   per event type — then emit events anywhere, fire-and-forget:
+   per event type), then emit events anywhere, fire-and-forget:
    ```rust
    use adaliszk_events::resolve_events;
    use project_foundation::MessageArrived;

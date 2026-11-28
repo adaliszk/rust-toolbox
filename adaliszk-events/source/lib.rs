@@ -6,7 +6,7 @@
 //! [`adaliszk-anymap`](adaliszk_anymap) dependency-injection [`Container`]. An event is a plain
 //! struct marked with [`event`]; a listener is a free `async fn` marked with [`listen`] bound to
 //! its event with `event = TheEvent`, and every parameter is pulled from the container by
-//! type — in any position — when an emitted event reaches it.
+//! type (in any position) when an emitted event reaches it.
 //!
 //! The `Resolvable` derive expanded by [`event`] resolves to
 //! [`adaliszk-anymap`](https://crates.io/crates/adaliszk-anymap) paths, so it is expected as a

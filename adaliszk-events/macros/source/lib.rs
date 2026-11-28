@@ -25,7 +25,7 @@ mod listen;
 /// fn main() {}
 /// ```
 ///
-/// Do not derive `Resolvable` or `Clone` yourself — the attribute adds them. Other derives
+/// Do not derive `Resolvable` or `Clone` yourself; the attribute adds them. Other derives
 /// (`Debug`, etc.) can still be added in your own `#[derive(...)]` list.
 ///
 /// ## Panics
@@ -41,8 +41,8 @@ pub fn event(attr: TokenStream, item: TokenStream) -> TokenStream
 ///
 /// # Register a listener for an event from a free `async fn`
 ///
-/// The `event = TheEvent` binding names the event the listener reacts to — the registry key,
-/// like `console_command`'s `args = ...`. Every parameter — the event included — is resolved
+/// The `event = TheEvent` binding names the event the listener reacts to (the registry key,
+/// like `console_command`'s `args = ...`). Every parameter (the event included) is resolved
 /// from the `adaliszk_events::Container` by its type, in any position, when an emitted event
 /// reaches the listener:
 ///

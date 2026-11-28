@@ -70,7 +70,7 @@ impl Container
 
     /// Borrow the bound instance of type `T`, if one was bound with [`bind`](Container::bind).
     ///
-    /// Factory-provided values are built per call, so there is nothing stored to borrow — use
+    /// Factory-provided values are built per call, so there is nothing stored to borrow; use
     /// [`require`](Container::require) (or [`make`](Container::make)) for those. This is the
     /// zero-clone access, and the only access to a non-`Clone` bound value.
     pub fn borrow<T: Any + Send + Sync>(&self) -> Option<&T>

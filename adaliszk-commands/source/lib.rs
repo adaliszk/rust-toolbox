@@ -6,14 +6,14 @@
 //! in [`inventory`](https://crates.io/crates/inventory), and at resolve time each parameter is
 //! pulled from the container by type.
 //!
-//! The container must already hold every dependency a command needs. Filling it — parsing CLI
-//! arguments, loading config, binding both in — is the job of the clap front-end
+//! The container must already hold every dependency a command needs. Filling it (parsing CLI
+//! arguments, loading config, binding both in) is the job of the clap front-end
 //! (`adaliszk-console`); this crate has no clap dependency.
 //!
 
 /// Re-export of [`adaliszk-anymap`](https://crates.io/crates/adaliszk-anymap)'s container.
 ///
-/// The `Resolvable` trait and derive are expected from `adaliszk-anymap` directly — the derive
+/// The `Resolvable` trait and derive are expected from `adaliszk-anymap` directly; the derive
 /// expands to that crate's paths, so it must be a dependency of the crate deriving it.
 pub use adaliszk_anymap::Container;
 

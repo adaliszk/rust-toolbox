@@ -26,7 +26,7 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
         return Err(syn::Error::new_spanned(&func.sig, "#[listen] requires an async fn"));
     }
 
-    // Each parameter resolves from the container by its (dereferenced) type, in any position —
+    // Each parameter resolves from the container by its (dereferenced) type, in any position,
     // the event included, since the dispatcher binds it before the listener runs.
     let mut bindings = Vec::new();
     let mut call_args = Vec::new();
@@ -38,7 +38,7 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
         });
         call_args.push(if by_ref { quote! { &#var } } else { quote! { #var } });
     }
-    // The attribute names the event — the registry key — like `console_command`'s
+    // The attribute names the event (the registry key) like `console_command`'s
     // `args = ...`; the parameters stay uniform and all resolve from the container.
     let Some(event_type) = explicit_event else {
         return Err(syn::Error::new_spanned(
@@ -81,7 +81,6 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
     })
 }
 
-/// Parse the attribute options: an optional `event = Type`, rejecting anything else.
 fn parse_options(attr: TokenStream) -> syn::Result<Option<Path>>
 {
     let mut event: Option<Path> = None;

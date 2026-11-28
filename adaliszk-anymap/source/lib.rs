@@ -7,7 +7,7 @@
 //! A [`Container`] holds at most one provider per type: a bound value
 //! ([`bind`](Container::bind)), a transient factory ([`bind_with`](Container::bind_with)) run
 //! on every resolve, or a lazy singleton ([`singleton_with`](Container::singleton_with)) built
-//! once and cached. The [`Resolvable`] derive lets a type pull itself out of a container — the
+//! once and cached. The [`Resolvable`] derive lets a type pull itself out of a container, the
 //! building block for the project's handler dependency injection.
 //!
 //! ```rust

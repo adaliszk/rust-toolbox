@@ -56,7 +56,7 @@ async fn on_message_count(event: &MessageArrived) -> EventResult
     Ok(())
 }
 
-/// Reacts to a different event — must not run for messages
+/// Reacts to a different event, so it must not run for messages
 #[listen(event = UserJoined)]
 async fn on_user_joined(_event: &UserJoined) -> EventResult
 {
@@ -108,7 +108,7 @@ fn meeting() -> &'static tokio::sync::Barrier
     MEETING.get_or_init(|| tokio::sync::Barrier::new(2))
 }
 
-/// Waits for its sibling — only possible when listeners run concurrently
+/// Waits for its sibling, only possible when listeners run concurrently
 #[listen(event = Simultaneous)]
 async fn first_at_the_meeting(_event: &Simultaneous) -> EventResult
 {
@@ -157,7 +157,7 @@ struct WithDependency
     _marker: u8,
 }
 
-/// Needs a service beyond the event itself — and takes it FIRST: parameters resolve by
+/// Needs a service beyond the event itself, and takes it FIRST: parameters resolve by
 /// type in any position, the binding names the event.
 #[listen(event = WithDependency)]
 async fn on_with_dependency(needed: &Needed, _event: &WithDependency) -> EventResult

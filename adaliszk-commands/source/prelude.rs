@@ -8,8 +8,8 @@ pub struct ResolvedCommand
 {
     /// The dependency-injection container the command resolves its parameters from.
     ///
-    /// Bind the command's dependencies — values, `bind_with` factories, or `singleton_with`
-    /// singletons — before [`resolve`](Self::resolve).
+    /// Bind the command's dependencies (values, `bind_with` factories, or `singleton_with`
+    /// singletons) before [`resolve`](Self::resolve).
     pub container: Container,
     registration: &'static dyn CommandRegistration,
 }
@@ -26,7 +26,7 @@ impl ResolvedCommand
 
 /// Find a registered command by name, ready to run with a carried [`Container`].
 ///
-/// This is the front-end-free dispatch: no argument parsing and no configuration loading —
+/// This is the front-end-free dispatch: no argument parsing and no configuration loading;
 /// the caller binds every dependency itself. A CLI front-end like `adaliszk-console` does
 /// those parts on top.
 ///

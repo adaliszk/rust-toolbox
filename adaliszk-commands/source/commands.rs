@@ -4,10 +4,9 @@
 use crate::Container;
 use async_trait::async_trait;
 
-/// A boxed, thread-safe error returned by command handlers.
-///
-/// Any [`Error`](std::error::Error) that is [`Send`] + [`Sync`] converts into it with `?`.
-pub type AsyncError = Box<dyn std::error::Error + Send + Sync>;
+/// Re-export of [`adaliszk-prelude`](https://crates.io/crates/adaliszk-prelude)'s boxed,
+/// thread-safe error, returned by command handlers.
+pub use adaliszk_prelude::AsyncError;
 
 /// The result a command handler returns: `Ok(())` on success, or any [`AsyncError`].
 pub type CommandResult = Result<(), AsyncError>;

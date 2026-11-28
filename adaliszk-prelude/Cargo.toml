@@ -28,6 +28,7 @@ tracing-appender = { version = "0.2" }
 [dev-dependencies]
 rstest.workspace = true
 googletest.workspace = true
+tracing = { version = "0.1" }
 
 [package.metadata.release]
 shared-version = "prelude"

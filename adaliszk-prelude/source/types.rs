@@ -5,6 +5,11 @@ use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use strum::{AsRefStr, Display, IntoStaticStr};
 
+/// A boxed, thread-safe error for async results.
+///
+/// Any [`Error`](std::error::Error) that is [`Send`] + [`Sync`] converts into it with `?`.
+pub type AsyncError = Box<dyn std::error::Error + Send + Sync>;
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct LoggingConfig
 {

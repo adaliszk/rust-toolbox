@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 mod types;
+pub use types::AsyncError;
 
 pub mod config;
 

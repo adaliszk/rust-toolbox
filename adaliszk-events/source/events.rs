@@ -5,8 +5,9 @@ use crate::Container;
 use async_trait::async_trait;
 use std::any::TypeId;
 
-/// A boxed, thread-safe error returned by event listeners.
-pub type AsyncError = Box<dyn std::error::Error + Send + Sync>;
+/// Re-export of [`adaliszk-prelude`](https://crates.io/crates/adaliszk-prelude)'s boxed,
+/// thread-safe error, returned by event listeners.
+pub use adaliszk_prelude::AsyncError;
 
 /// The result an event listener returns: `Ok(())` on success, or any [`AsyncError`].
 pub type EventResult = Result<(), AsyncError>;

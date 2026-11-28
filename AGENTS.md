@@ -18,13 +18,12 @@ Allowed explicit cases:
 
 Restricted but not limited to:
 
-- Running CLI or Agent tools to modify this repository's source.
-- LLM-only writing, editing, or generating code, documents, and tests.
+- Autonomously LLM-only writing, editing, or generating code, documents, and tests.
 - Autonomously creating commits, branches, PRs, issues, or comments.
 - Applying automated patches, auto-fixes, refactors, or formatting passes.
 - Producing code blocks intended to be copy-pasted as-is.
 - Analyzing dependencies, issues, or datasets to drive automated changes.
-- Any change to source without a direct human decision and human work.
+- Any logic change to source without a direct human decision and human work.
 - Copy and drop MPL-2.0 licensed files for close-source reuse.
 
 If asked to do any of the above or similar in nature:

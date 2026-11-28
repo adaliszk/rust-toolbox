@@ -26,7 +26,7 @@ a decade now. Nothing crazy, 99% the official with a tiny tweak here and there.
 | [`adaliszk-console`](./adaliszk-console/README.md)   | Library | Inventory for Clap-based CLI applications        | [![v](https://img.shields.io/crates/v/adaliszk-console?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-console)   |
 | [`adaliszk-commands`](./adaliszk-commands/README.md) | Library | Inventory for Commands resolved through DI       | [![v](https://img.shields.io/crates/v/adaliszk-commands?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-commands) |
 | [`adaliszk-events`](./adaliszk-events/README.md)     | Library | Inventory for event dispatch through DI          | [![v](https://img.shields.io/crates/v/adaliszk-events?logo=&label=&style=flat-square)](https://crates.io/crates/adaliszk-events)     |
-| `adlaiszk-terminal`                                  | Library | _Inventory for Rattatui-based CLI applications_  | —                                                                                                                                    |
+| `adaliszk-terminal`                                  | Library | _Inventory for Rattatui-based CLI applications_  | _planned_                                                                                                                            |
 
 ### Design & Concept
 
@@ -79,8 +79,10 @@ This gives two things:
 
 Licensed under the Mozilla Public License 2.0 (MPL-2.0). See [LICENSE](./LICENSE.md)
 
-Development was done with LLM as a search engine and debugger (meaning it is for learning only),
-NO SOURCE LINES where generated or changed without direct human decisions and work.
+Development was done with LLM as a search engine, debugger, refactoring tool (meaning it is for
+learning or handling boring things). In some cases, mainly macros, the initial version was
+generated, check the README of each crate for exact disclosure. By default, NO SOURCE LINES
+intended to be generated or changed without direct human decisions and work.
 
 Contributions expected to follow the same **No-Automated-LLM Contributions** policy with strict
 limitations to retain the quality and understanding!

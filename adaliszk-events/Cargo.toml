@@ -14,7 +14,7 @@ readme = "README.md"
 path = "source/lib.rs"
 
 [dependencies]
-adaliszk-anymap = { path = "../adaliszk-anymap", version = "0.1.2" }
+adaliszk-anymap = { path = "../adaliszk-anymap", version = "0.2.0" }
 adaliszk-events-macros = { path = "./macros", version = "0.1.1" }
 adaliszk-prelude = { path = "../adaliszk-prelude", version = "0.3.1" }
 async-trait.workspace = true

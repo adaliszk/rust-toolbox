@@ -4,11 +4,12 @@
 
 ## What it provides
 
-`#[command(name = "...", about = "...")]`
+`#[command(name = "...", about = "...", tag = "...")]`
 
 The attribute registers a free `async fn` in `inventory` and
-generates a `CommandRegistration` that resolves each parameter from a `Container` by type. Use
-`adaliszk-commands` directly; this crate is re-exported from it.
+generates a `CommandRegistration` that resolves each parameter from a `Container` by type. The
+optional `tag` makes the command opt-in: it resolves only when the application enables the tag.
+Use `adaliszk-commands` directly; this crate is re-exported from it.
 
 ## License & Disclosure
 

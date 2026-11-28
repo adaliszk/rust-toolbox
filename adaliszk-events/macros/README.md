@@ -9,11 +9,12 @@
 Attaches `#[derive(Resolvable, Clone)]` to an event struct and implements `Dispatchable`, so it
 can be handed to `dispatch` and resolved by its listeners from the container.
 
-`#[listen(event = TheEvent)]`
+`#[listen(event = TheEvent, tag = "...")]`
 
 Registers a free `async fn` in `inventory` as a listener, keyed by the required
 `event = TheEvent` binding. Every parameter is resolved from a `Container` by type (in any
-position) at dispatch.
+position) at dispatch. The optional `tag` makes the listener opt-in: it subscribes only when
+the application enables the tag.
 
 ## License & Disclosure
 

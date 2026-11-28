@@ -75,6 +75,37 @@ async fn an_application_bound_service_reaches_the_handler()
     app.resolve().await.expect("dispatch succeeds");
 }
 
+/// Hidden behind the ops tag
+#[console_command(tag = "ops")]
+async fn maintenance(_config: &AppConfig) -> CommandResult
+{
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_tagged_command_resolves_with_its_tag_enabled()
+{
+    let mut app =
+        adaliszk_console::resolve_console_with_tags("app", ["app", "maintenance"], &["ops"])
+            .expect("the enabled tag reveals the command");
+
+    app.container.bind(AppConfig);
+    app.resolve().await.expect("dispatch succeeds");
+}
+
+#[test]
+fn the_tag_passes_through_to_the_command_registration()
+{
+    use adaliszk_console::CommandRegistration;
+
+    let command = adaliszk_console::inventory::iter::<&'static dyn CommandRegistration>
+        .into_iter()
+        .find(|command| command.name() == "maintenance")
+        .expect("the command is registered");
+
+    assert_eq!(command.tag(), Some("ops"));
+}
+
 #[test]
 fn a_console_registration_points_to_its_command()
 {

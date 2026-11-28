@@ -63,8 +63,45 @@ impl ResolvedCommand
 /// Returns an error when no command with `name` is registered.
 pub fn resolve_commands(name: &str) -> Result<ResolvedCommand, AsyncError>
 {
+    resolve_commands_with_tags(name, &[])
+}
+
+/// [`resolve_commands`] with the given tag groups enabled.
+///
+/// An untagged command always matches; a command registered with `#[command(tag = "...")]`
+/// matches only when its tag is in `tags`. Tags behave as opt-in groups, so
+/// [`resolve_commands`] (an empty tag set) sees the untagged commands only.
+///
+/// # Usage
+///
+/// ```rust
+/// use adaliszk_commands::{command, resolve_commands, resolve_commands_with_tags, CommandResult};
+///
+/// /// Seeds example data; wanted in developer builds only
+/// #[command(tag = "dev")]
+/// async fn seed() -> CommandResult
+/// {
+///     Ok(())
+/// }
+///
+/// #[tokio::main]
+/// async fn main() -> CommandResult
+/// {
+///     assert!(resolve_commands("seed").is_err(), "tagged commands are opt-in");
+///     resolve_commands_with_tags("seed", &["dev"])?.resolve().await
+/// }
+/// ```
+///
+/// # Errors
+///
+/// Returns an error when no command with `name` is registered within the enabled tags.
+pub fn resolve_commands_with_tags(
+    name: &str,
+    tags: &[&str],
+) -> Result<ResolvedCommand, AsyncError>
+{
     for registration in inventory::iter::<&'static dyn CommandRegistration> {
-        if registration.name() == name {
+        if registration.name() == name && tag_enabled(registration.tag(), tags) {
             return Ok(ResolvedCommand {
                 container: Container::default(),
                 registration: *registration,
@@ -73,4 +110,10 @@ pub fn resolve_commands(name: &str) -> Result<ResolvedCommand, AsyncError>
     }
 
     Err(format!("command `{name}` is not registered").into())
+}
+
+#[doc(hidden)] // Shared with the console front-end only
+pub fn tag_enabled(tag: Option<&str>, tags: &[&str]) -> bool
+{
+    tag.is_none_or(|tag| tags.contains(&tag))
 }

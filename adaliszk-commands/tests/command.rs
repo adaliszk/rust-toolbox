@@ -130,6 +130,45 @@ fn resolve_commands_errors_on_an_unknown_name()
     assert!(error.to_string().contains("does-not-exist"));
 }
 
+/// Seeds example data; wanted only when the dev tag is enabled
+#[command(name = "seed", tag = "dev")]
+async fn seed_command() -> CommandResult
+{
+    Ok(())
+}
+
+#[test]
+fn tag_comes_from_the_attribute_or_defaults_to_none()
+{
+    assert_eq!(registration("seed").tag(), Some("dev"));
+    assert_eq!(registration("noop").tag(), None);
+}
+
+#[tokio::test]
+async fn a_tagged_command_resolves_only_with_its_tag_enabled()
+{
+    assert!(
+        adaliszk_commands::resolve_commands("seed").is_err(),
+        "tagged commands are opt-in"
+    );
+
+    adaliszk_commands::resolve_commands_with_tags("seed", &["dev"])
+        .expect("the enabled tag reveals the command")
+        .resolve()
+        .await
+        .expect("resolve succeeds");
+}
+
+#[tokio::test]
+async fn an_untagged_command_resolves_whatever_tags_are_enabled()
+{
+    adaliszk_commands::resolve_commands_with_tags("noop", &["dev", "ops"])
+        .expect("untagged commands always resolve")
+        .resolve()
+        .await
+        .expect("resolve succeeds");
+}
+
 #[tokio::test]
 async fn a_by_value_parameter_resolves_to_an_owned_value()
 {

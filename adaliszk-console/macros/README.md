@@ -4,10 +4,10 @@
 
 ## What it provides
 
-`#[console_command(name = "...", about = "...", args = TheArgs)]`
+`#[console_command(name = "...", about = "...", tag = "...", args = TheArgs)]`
 
 A drop-in replacement for `adaliszk-commands`' `#[command]` attribute (which it applies under
-the hood, passing `name` and `about` through). The optional `args = TheArgs` links the command's
+the hood, passing `name`, `about`, and `tag` through). The optional `args = TheArgs` links the command's
 flags: the console contributes the struct's flags to the clap subcommand and binds the parsed
 value into the dependency-injection container.
 

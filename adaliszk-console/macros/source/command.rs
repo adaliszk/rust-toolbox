@@ -24,13 +24,16 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
 
     let fn_ident = func.sig.ident.clone();
 
-    // Pass the name/about options through to the clap-free `#[command]` registration:
+    // Pass the name/about/tag options through to the clap-free `#[command]` registration:
     let mut passthrough = Vec::new();
     if let Some(name) = &options.name {
         passthrough.push(quote! { name = #name });
     }
     if let Some(about) = &options.about {
         passthrough.push(quote! { about = #about });
+    }
+    if let Some(tag) = &options.tag {
+        passthrough.push(quote! { tag = #tag });
     }
 
     // Link the args struct, when given, as this command's console registration. The chained
@@ -81,6 +84,7 @@ struct Options
 {
     name: Option<LitStr>,
     about: Option<LitStr>,
+    tag: Option<LitStr>,
     args: Option<Path>,
 }
 
@@ -88,18 +92,20 @@ fn parse_options(attr: TokenStream) -> syn::Result<Options>
 {
     let mut name: Option<LitStr> = None;
     let mut about: Option<LitStr> = None;
+    let mut tag: Option<LitStr> = None;
     let mut args: Option<Path> = None;
     let parser = syn::meta::parser(|meta| {
         match meta.path.get_ident().map(ToString::to_string).as_deref() {
             Some("name") => name = Some(meta.value()?.parse()?),
             Some("about") => about = Some(meta.value()?.parse()?),
+            Some("tag") => tag = Some(meta.value()?.parse()?),
             Some("args") => args = Some(meta.value()?.parse()?),
             _ => return Err(meta.error("unknown console_command option")),
         }
         Ok(())
     });
     parser.parse2(attr)?;
-    Ok(Options { name, about, args })
+    Ok(Options { name, about, tag, args })
 }
 
 #[cfg(test)]
@@ -147,6 +153,19 @@ mod tests
         assert!(generated.contains("ConsoleRegistration"));
         assert!(generated.contains("__example_command"), "direct link to the command instance");
         assert!(generated.contains("ExampleArgs"));
+    }
+
+    #[test]
+    fn parse_passes_the_tag_through()
+    {
+        let generated = parse(
+            quote!(tag = "ops"),
+            quote! { async fn example() -> CommandResult { Ok(()) } },
+        )
+        .unwrap()
+        .to_string();
+
+        assert!(generated.contains("tag = \"ops\""));
     }
 
     #[test]

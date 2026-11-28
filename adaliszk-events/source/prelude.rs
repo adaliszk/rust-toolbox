@@ -56,15 +56,64 @@ pub struct EventDispatcher
 /// ```
 pub fn resolve_events() -> EventDispatcher
 {
-    resolve_events_with_capacity(512)
+    resolve_events_with_capacity(DEFAULT_CAPACITY)
 }
 
 /// [`resolve_events`] with a custom per-channel capacity of pending events.
 pub fn resolve_events_with_capacity(capacity: usize) -> EventDispatcher
 {
+    subscribe_listeners(capacity, &[])
+}
+
+/// [`resolve_events`] with the given tag groups enabled.
+///
+/// An untagged listener always subscribes; a listener registered with
+/// `#[listen(event = ..., tag = "...")]` subscribes only when its tag is in `tags`. Tags
+/// behave as opt-in groups, so [`resolve_events`] (an empty tag set) wires the untagged
+/// listeners only.
+///
+/// # Usage
+///
+/// ```rust
+/// use adaliszk_events::{event, listen, resolve_events, resolve_events_with_tags, EventResult};
+///
+/// #[event]
+/// struct Measured
+/// {
+///     value: u64,
+/// }
+///
+/// /// Ships measurements; wanted only when telemetry is enabled
+/// #[listen(event = Measured, tag = "telemetry")]
+/// async fn on_measured(event: &Measured) -> EventResult
+/// {
+///     Ok(())
+/// }
+///
+/// #[tokio::main]
+/// async fn main()
+/// {
+///     let silent = resolve_events();
+///     assert_eq!(silent.emit(Measured { value: 1 }), 0, "tagged listeners are opt-in");
+///
+///     let telemetry = resolve_events_with_tags(&["telemetry"]);
+///     assert_eq!(telemetry.emit(Measured { value: 1 }), 1);
+/// }
+/// ```
+pub fn resolve_events_with_tags(tags: &[&str]) -> EventDispatcher
+{
+    subscribe_listeners(DEFAULT_CAPACITY, tags)
+}
+
+const DEFAULT_CAPACITY: usize = 512;
+
+fn subscribe_listeners(capacity: usize, tags: &[&str]) -> EventDispatcher
+{
     let mut dispatcher = EventDispatcher { channels: Container::default(), capacity };
     for listener in inventory::iter::<&'static dyn EventRegistration> {
-        listener.subscribe(&mut dispatcher);
+        if listener.tag().is_none_or(|tag| tags.contains(&tag)) {
+            listener.subscribe(&mut dispatcher);
+        }
     }
     dispatcher
 }

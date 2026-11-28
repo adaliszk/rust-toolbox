@@ -21,6 +21,10 @@ pub trait Dispatchable: Clone + Send + Sync + 'static {}
 pub trait EventRegistration: Send + Sync
 {
     fn event(&self) -> TypeId;
+    fn tag(&self) -> Option<&'static str>
+    {
+        None
+    }
     fn subscribe(&'static self, bus: &mut crate::EventDispatcher);
     async fn resolve(&self, container: &Container) -> EventResult;
 }

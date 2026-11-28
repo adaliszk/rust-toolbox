@@ -4,7 +4,7 @@
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::parse::Parser;
-use syn::{FnArg, ItemFn, Path, Type};
+use syn::{FnArg, ItemFn, LitStr, Path, Type};
 
 #[doc(hidden)] // Internal use only
 pub fn expand(
@@ -19,7 +19,7 @@ pub fn expand(
 
 pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
 {
-    let explicit_event = parse_options(attr)?;
+    let (explicit_event, tag_attr) = parse_options(attr)?;
     let func: ItemFn = syn::parse2(item)?;
 
     if func.sig.asyncness.is_none() {
@@ -50,6 +50,15 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
     let fn_ident = func.sig.ident.clone();
     let instance = format_ident!("__{}_listener", fn_ident);
 
+    // The trait defaults to no tag, so the override is only generated when one is given:
+    let tag = tag_attr.map(|text| {
+        quote! {
+            fn tag(&self) -> ::core::option::Option<&'static str> {
+                ::core::option::Option::Some(#text)
+            }
+        }
+    });
+
     Ok(quote! {
         #func
 
@@ -62,6 +71,8 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
             fn event(&self) -> ::core::any::TypeId {
                 ::core::any::TypeId::of::<#event_type>()
             }
+
+            #tag
 
             fn subscribe(&'static self, bus: &mut adaliszk_events::EventDispatcher) {
                 bus.attach::<#event_type>(self);
@@ -81,19 +92,23 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
     })
 }
 
-fn parse_options(attr: TokenStream) -> syn::Result<Option<Path>>
+fn parse_options(attr: TokenStream) -> syn::Result<(Option<Path>, Option<LitStr>)>
 {
     let mut event: Option<Path> = None;
+    let mut tag: Option<LitStr> = None;
     let parser = syn::meta::parser(|meta| {
         if meta.path.is_ident("event") {
             event = Some(meta.value()?.parse()?);
+            Ok(())
+        } else if meta.path.is_ident("tag") {
+            tag = Some(meta.value()?.parse()?);
             Ok(())
         } else {
             Err(meta.error("unknown listen option"))
         }
     });
     parser.parse2(attr)?;
-    Ok(event)
+    Ok((event, tag))
 }
 
 fn parameter_type(input: &FnArg) -> syn::Result<(Type, bool)>
@@ -156,6 +171,27 @@ mod tests
             quote! { async fn on_message(event: &MessageArrived) -> EventResult { Ok(()) } },
         )
         .is_err());
+    }
+
+    #[test]
+    fn a_tag_overrides_the_trait_default_only_when_given()
+    {
+        let tagged = parse(
+            quote!(event = MessageArrived, tag = "telemetry"),
+            quote! { async fn on_message(event: &MessageArrived) -> EventResult { Ok(()) } },
+        )
+        .unwrap()
+        .to_string();
+        assert!(tagged.contains("fn tag"));
+        assert!(tagged.contains("\"telemetry\""));
+
+        let untagged = parse(
+            quote!(event = MessageArrived),
+            quote! { async fn on_message(event: &MessageArrived) -> EventResult { Ok(()) } },
+        )
+        .unwrap()
+        .to_string();
+        assert!(!untagged.contains("fn tag"), "the trait default stays in place");
     }
 
     #[test]

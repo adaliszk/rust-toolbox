@@ -24,6 +24,13 @@ pub trait CommandRegistration: Send + Sync
     /// The command's one-line description, from its first `///` line or `about = "..."`.
     fn about(&self) -> Option<&'static str>;
 
+    /// The command's opt-in group from `tag = "..."`: `None` always resolves, `Some(tag)`
+    /// only when the resolver enables the tag; see [`resolve_commands_with_tags`](crate::resolve_commands_with_tags).
+    fn tag(&self) -> Option<&'static str>
+    {
+        None
+    }
+
     /// Resolve the handler's parameters from `container` by type, then run it.
     ///
     /// Returns an error if a parameter's dependency is not bound in the container.

@@ -196,6 +196,36 @@ async fn an_explicitly_bound_listener_receives_its_event()
     assert_eq!(confirmations(&mut confirmed, 1).await, ["explicit"]);
 }
 
+#[event]
+struct Measured
+{
+    _value: u64,
+}
+
+/// Ships measurements; wanted only when the telemetry tag is enabled
+#[listen(event = Measured, tag = "telemetry")]
+async fn on_measured_ship(_event: &Measured) -> EventResult
+{
+    Ok(())
+}
+
+/// Untagged, so every dispatcher subscribes it regardless of the enabled tags
+#[listen(event = Measured)]
+async fn on_measured_log(_event: &Measured) -> EventResult
+{
+    Ok(())
+}
+
+#[tokio::test]
+async fn a_tagged_listener_subscribes_only_with_its_tag_enabled()
+{
+    let silent = resolve_events();
+    assert_eq!(silent.emit(Measured { _value: 1 }), 1, "only the untagged listener");
+
+    let telemetry = adaliszk_events::resolve_events_with_tags(&["telemetry"]);
+    assert_eq!(telemetry.emit(Measured { _value: 1 }), 2, "the enabled tag adds its listener");
+}
+
 #[tokio::test]
 async fn a_listener_dependency_resolves_through_a_manual_container()
 {

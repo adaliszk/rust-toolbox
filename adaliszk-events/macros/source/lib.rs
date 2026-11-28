@@ -44,7 +44,8 @@ pub fn event(attr: TokenStream, item: TokenStream) -> TokenStream
 /// The `event = TheEvent` binding names the event the listener reacts to (the registry key,
 /// like `console_command`'s `args = ...`). Every parameter (the event included) is resolved
 /// from the `adaliszk_events::Container` by its type, in any position, when an emitted event
-/// reaches the listener:
+/// reaches the listener. An optional `tag = "..."` makes the listener opt-in: it subscribes
+/// only when the application enables the tag, e.g. with `resolve_events_with_tags`.
 ///
 /// ```rust
 /// use adaliszk_events::{event, listen, EventResult};

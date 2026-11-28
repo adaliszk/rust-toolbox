@@ -11,7 +11,9 @@ mod command;
 /// Each parameter is resolved from the `adaliszk_commands::Container` by its type, so every
 /// parameter type must implement `Resolvable` and be bound in the container before the command
 /// runs. The command name is the function name, or `#[command(name = "...")]`. Its one-line
-/// description comes from the first `///` line, or `#[command(about = "...")]`.
+/// description comes from the first `///` line, or `#[command(about = "...")]`. An optional
+/// `tag = "..."` makes the command opt-in: it resolves only when the application enables the
+/// tag, e.g. with `resolve_commands_with_tags`.
 ///
 /// ```rust
 /// use adaliszk_anymap::Resolvable;

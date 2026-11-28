@@ -19,7 +19,7 @@ pub fn expand(
 
 pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
 {
-    let (name_attr, about_attr) = parse_options(attr)?;
+    let (name_attr, about_attr, tag_attr) = parse_options(attr)?;
     let func: ItemFn = syn::parse2(item)?;
 
     if func.sig.asyncness.is_none() {
@@ -35,6 +35,15 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
         Some(text) => quote! { ::core::option::Option::Some(#text) },
         None => quote! { ::core::option::Option::None },
     };
+
+    // The trait defaults to no tag, so the override is only generated when one is given:
+    let tag = tag_attr.map(|text| {
+        quote! {
+            fn tag(&self) -> ::core::option::Option<&'static str> {
+                ::core::option::Option::Some(#text)
+            }
+        }
+    });
 
     let instance = format_ident!("__{}_command", fn_ident);
 
@@ -67,6 +76,8 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
 
             fn about(&self) -> ::core::option::Option<&'static str> { #about }
 
+            #tag
+
             async fn resolve(
                 &self, container: &adaliszk_commands::Container
             ) -> adaliszk_commands::CommandResult {
@@ -81,20 +92,22 @@ pub fn parse(attr: TokenStream, item: TokenStream) -> syn::Result<TokenStream>
     })
 }
 
-fn parse_options(attr: TokenStream) -> syn::Result<(Option<LitStr>, Option<LitStr>)>
+fn parse_options(attr: TokenStream) -> syn::Result<(Option<LitStr>, Option<LitStr>, Option<LitStr>)>
 {
     let mut name: Option<LitStr> = None;
     let mut about: Option<LitStr> = None;
+    let mut tag: Option<LitStr> = None;
     let parser = syn::meta::parser(|meta| {
         match meta.path.get_ident().map(ToString::to_string).as_deref() {
             Some("name") => name = Some(meta.value()?.parse()?),
             Some("about") => about = Some(meta.value()?.parse()?),
+            Some("tag") => tag = Some(meta.value()?.parse()?),
             _ => return Err(meta.error("unknown command option")),
         }
         Ok(())
     });
     parser.parse2(attr)?;
-    Ok((name, about))
+    Ok((name, about, tag))
 }
 
 fn command_name(name_attr: Option<LitStr>, fn_ident: &Ident) -> String
@@ -224,6 +237,34 @@ mod tests
         assert!(parse_options(quote!(name = "x", bogus = "y")).is_err());
         assert!(parse_options(quote!(name = "x", about = "y")).is_ok());
         assert!(parse_options(quote!()).is_ok());
+    }
+
+    #[test]
+    fn parse_options_accepts_a_tag()
+    {
+        let (_, _, tag) = parse_options(quote!(tag = "dev")).unwrap();
+        assert_eq!(tag.unwrap().value(), "dev");
+
+        let (_, _, tag) = parse_options(quote!(name = "x")).unwrap();
+        assert!(tag.is_none());
+    }
+
+    #[test]
+    fn a_tag_overrides_the_trait_default_only_when_given()
+    {
+        let tagged = parse(
+            quote!(tag = "dev"),
+            quote! { async fn seed() -> CommandResult { Ok(()) } },
+        )
+        .unwrap()
+        .to_string();
+        assert!(tagged.contains("fn tag"));
+        assert!(tagged.contains("\"dev\""));
+
+        let untagged = parse(quote!(), quote! { async fn seed() -> CommandResult { Ok(()) } })
+            .unwrap()
+            .to_string();
+        assert!(!untagged.contains("fn tag"), "the trait default stays in place");
     }
 
     #[test]

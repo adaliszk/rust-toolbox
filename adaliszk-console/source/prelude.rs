@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 use crate::{ConsoleOptions, ConsoleRegistration};
-use adaliszk_commands::{AsyncError, CommandRegistration, CommandResult, Container};
+use adaliszk_commands::{tag_enabled, AsyncError, CommandRegistration, CommandResult, Container};
 use adaliszk_prelude::config::{ParseError, parse_files, resolve_paths};
 use clap::{ArgMatches, Args, Command, FromArgMatches};
 use serde::de::DeserializeOwned;
@@ -150,9 +150,46 @@ pub fn resolve_console<ARG>(
 where
     ARG: Into<OsString> + Clone,
 {
+    resolve_console_with_tags(info, argv, &[])
+}
+
+/// [`resolve_console`] with the given tag groups enabled.
+///
+/// An untagged command always becomes a subcommand; a command registered with
+/// `#[console_command(tag = "...")]` appears only when its tag is in `tags`. Tags behave as
+/// opt-in groups, so [`resolve_console`] (an empty tag set) builds the CLI from the untagged
+/// commands only. Useful to gate maintenance or developer commands behind a build flag:
+///
+/// ```rust,no_run
+/// use adaliszk_console::resolve_console_with_tags;
+///
+/// # fn main() -> Result<(), adaliszk_console::AsyncError> {
+/// let tags: &[&str] = if cfg!(debug_assertions) { &["dev"] } else { &[] };
+/// let app = resolve_console_with_tags("app", std::env::args_os(), tags)?;
+/// # Ok(()) }
+/// ```
+///
+/// # Errors
+///
+/// Returns the clap error when configuration parsing or argument matching fails.
+///
+/// # Panics
+///
+/// Panics when clap matched no subcommand, which clap normally prevents.
+pub fn resolve_console_with_tags<ARG>(
+    info: impl Into<ConsoleInfo>,
+    argv: impl IntoIterator<Item = ARG>,
+    tags: &[&str],
+) -> Result<ResolvedConsoleCommand, AsyncError>
+where
+    ARG: Into<OsString> + Clone,
+{
     let mut cli = build_cli(info.into());
 
     for registration in inventory::iter::<&'static dyn CommandRegistration> {
+        if !tag_enabled(registration.tag(), tags) {
+            continue;
+        }
         let mut command = Command::new(registration.name());
         if let Some(about) = registration.about() {
             command = command.about(about);
@@ -170,7 +207,7 @@ where
     let (name, params) = matches.subcommand().unwrap();
 
     for registration in inventory::iter::<&'static dyn CommandRegistration> {
-        if registration.name() == name {
+        if registration.name() == name && tag_enabled(registration.tag(), tags) {
             return Ok(ResolvedConsoleCommand {
                 container: Container::default(),
                 registration: *registration,

@@ -9,8 +9,8 @@ mod command;
 ///
 /// # Register a console command, optionally linking its arguments
 ///
-/// A drop-in replacement for `#[command]` (which it applies under the hood, passing `name` and
-/// `about` through) that can also link the command's `args` struct; the console then
+/// A drop-in replacement for `#[command]` (which it applies under the hood, passing `name`,
+/// `about`, and `tag` through) that can also link the command's `args` struct; the console then
 /// contributes the struct's flags to the command's clap subcommand and binds the parsed value
 /// into the dependency-injection container:
 ///

@@ -56,12 +56,48 @@ impl ResolvedConsoleCommand
     }
 }
 
+/// The CLI identity shown by clap's help and version output.
+///
+/// Fill it from the application's Cargo metadata: the `CARGO_PKG_*` macros expand in the
+/// application crate, so the values come from its own Cargo.toml:
+///
+/// ```rust
+/// use adaliszk_console::ConsoleInfo;
+///
+/// let info = ConsoleInfo {
+///     name: env!("CARGO_PKG_NAME"),
+///     version: option_env!("CARGO_PKG_VERSION"),
+///     about: option_env!("CARGO_PKG_DESCRIPTION"),
+/// };
+/// ```
+///
+/// Or construct it by hand for custom text; unset fields come from [`Default`], and a plain
+/// `&'static str` converts into a name-only identity.
+#[derive(Default)]
+pub struct ConsoleInfo
+{
+    /// The binary name shown in the usage line.
+    pub name: &'static str,
+    /// Enables clap's `-V`/`--version` flag when set.
+    pub version: Option<&'static str>,
+    /// The description shown at the top of `--help` when set.
+    pub about: Option<&'static str>,
+}
+
+impl From<&'static str> for ConsoleInfo
+{
+    fn from(name: &'static str) -> Self
+    {
+        Self { name, ..Self::default() }
+    }
+}
+
 /// Parse the given arguments and resolve the invoked command.
 ///
-/// Builds a clap CLI named `name` from [`ConsoleOptions`] plus every registered command — each
-/// subcommand carries its `about` and the flags of the args struct linked with
-/// [`console_command`](crate::console_command) — then parses `argv` (normally
-/// `std::env::args_os()`).
+/// Builds a clap CLI carrying the given [`ConsoleInfo`] identity (or a plain name) from
+/// [`ConsoleOptions`] plus every registered command, where each subcommand carries its `about`
+/// and the flags of the args struct linked with [`console_command`](crate::console_command),
+/// then parses `argv` (normally `std::env::args_os()`).
 ///
 /// Returns the matched command with context as [`ResolvedConsoleCommand`].
 ///
@@ -70,7 +106,7 @@ impl ResolvedConsoleCommand
 /// While it handles most of the clap-related things, it leaves out the last step for you:
 ///
 /// ```rust,no_run
-/// use adaliszk_console::resolve_console;
+/// use adaliszk_console::{resolve_console, ConsoleInfo};
 /// use adaliszk_prelude::config::LoggingConfig;
 /// use adaliszk_prelude::tracing::{init_tracing, workspace_crates};
 ///
@@ -85,7 +121,13 @@ impl ResolvedConsoleCommand
 /// #[tokio::main]
 /// async fn main() -> adaliszk_console::CommandResult
 /// {
-///     let mut app = resolve_console("cli", std::env::args_os())?;
+///     let info = ConsoleInfo {
+///         name: env!("CARGO_PKG_NAME"),
+///         version: option_env!("CARGO_PKG_VERSION"),
+///         about: option_env!("CARGO_PKG_DESCRIPTION"),
+///     };
+///
+///     let mut app = resolve_console(info, std::env::args_os())?;
 ///     let config: AppConfig = app.load_config()?; // also bound into `app.container`
 ///     let _logging = init_tracing(&workspace_crates!(), &config.logging)?;
 ///     // ^^^ Note the guard here needs to stay bound to keep trace logging alive!
@@ -102,17 +144,13 @@ impl ResolvedConsoleCommand
 ///
 /// Panics when clap matched no subcommand, which clap normally prevents.
 pub fn resolve_console<ARG>(
-    name: &'static str,
+    info: impl Into<ConsoleInfo>,
     argv: impl IntoIterator<Item = ARG>,
 ) -> Result<ResolvedConsoleCommand, AsyncError>
 where
     ARG: Into<OsString> + Clone,
 {
-    let mut cli = Command::new(name);
-    cli = ConsoleOptions::augment_args(cli)
-        // TODO: add description and version for the main command
-        .arg_required_else_help(true)
-        .subcommand_required(true);
+    let mut cli = build_cli(info.into());
 
     for registration in inventory::iter::<&'static dyn CommandRegistration> {
         let mut command = Command::new(registration.name());
@@ -143,4 +181,59 @@ where
     }
 
     unreachable!("clap should have ensured to have at least one subcommand");
+}
+
+fn build_cli(info: ConsoleInfo) -> Command
+{
+    // The identity comes after the augmentation, as the derive applies its own about reset.
+    // Cargo sets CARGO_PKG_DESCRIPTION to "" when absent, so an empty about is dropped here:
+    ConsoleOptions::augment_args(Command::new(info.name))
+        .version(info.version)
+        .about(info.about.filter(|about| !about.is_empty()))
+        .arg_required_else_help(true)
+        .subcommand_required(true)
+}
+
+#[cfg(test)]
+mod tests
+{
+    use super::*;
+
+    #[test]
+    fn the_console_info_reaches_the_cli()
+    {
+        let cli = build_cli(ConsoleInfo {
+            name: "app",
+            version: Some("1.2.3"),
+            about: Some("Does things"),
+        });
+
+        assert_eq!(cli.get_name(), "app");
+        assert_eq!(cli.get_version(), Some("1.2.3"));
+        assert_eq!(
+            cli.get_about().map(ToString::to_string),
+            Some("Does things".into())
+        );
+    }
+
+    #[test]
+    fn a_name_only_identity_adds_no_version_or_about()
+    {
+        let cli = build_cli("app".into());
+
+        assert_eq!(cli.get_version(), None);
+        assert_eq!(cli.get_about(), None);
+    }
+
+    #[test]
+    fn an_empty_cargo_description_is_dropped_from_the_about()
+    {
+        let cli = build_cli(ConsoleInfo {
+            name: "app",
+            about: Some(""),
+            ..ConsoleInfo::default()
+        });
+
+        assert_eq!(cli.get_about(), None);
+    }
 }

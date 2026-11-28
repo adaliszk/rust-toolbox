@@ -88,6 +88,15 @@ fn a_console_registration_points_to_its_command()
     assert_eq!(command.about(), Some("Runs the simple command"));
 }
 
+#[test]
+fn the_global_options_do_not_leak_into_the_main_about()
+{
+    use clap::Args;
+
+    let cli = adaliszk_console::ConsoleOptions::augment_args(clap::Command::new("app"));
+    assert_eq!(cli.get_about(), None);
+}
+
 #[tokio::test]
 async fn a_missing_config_binding_is_an_error()
 {

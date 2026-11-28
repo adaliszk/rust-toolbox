@@ -21,7 +21,7 @@ pub struct AppConfig
 
 Then declare a command as a free `async fn` and, when it takes flags, its args struct. The
 command's name comes from the function (or `name = "..."`), its `--help` text from the first
-`///` line (or `about = "..."`), and `args = TheArgs` links the flags — every parameter is
+`///` line (or `about = "..."`), and `args = TheArgs` links the flags; every parameter is
 resolved from the container by type:
 
 ```rust
@@ -66,7 +66,7 @@ async fn main() -> CommandResult
 ```
 
 The resolved command carries the container: `load_config` binds the loaded config into it, the
-console adds the command's parsed args, and the handler pulls each parameter out by type — so
+console adds the command's parsed args, and the handler pulls each parameter out by type, so
 the config type derives `Resolvable` and every command in the application shares one config
 type. Commands that need no CLI flags can use the clap-free `#[command]` from
 `adaliszk-commands` directly.

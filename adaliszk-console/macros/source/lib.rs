@@ -10,7 +10,7 @@ mod command;
 /// # Register a console command, optionally linking its arguments
 ///
 /// A drop-in replacement for `#[command]` (which it applies under the hood, passing `name` and
-/// `about` through) that can also link the command's `args` struct — the console then
+/// `about` through) that can also link the command's `args` struct; the console then
 /// contributes the struct's flags to the command's clap subcommand and binds the parsed value
 /// into the dependency-injection container:
 ///
@@ -71,7 +71,7 @@ pub fn console_command(attr: TokenStream, item: TokenStream) -> TokenStream
 /// fn main() {}
 /// ```
 ///
-/// Do not derive `clap::Args`, `Resolvable`, or `Clone` yourself — the attribute adds them.
+/// Do not derive `clap::Args`, `Resolvable`, or `Clone` yourself; the attribute adds them.
 /// Other derives (`Debug`, etc.) can still be added in your own `#[derive(...)]` list.
 ///
 /// ## Panics

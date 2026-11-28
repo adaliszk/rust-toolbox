@@ -10,9 +10,9 @@
 //! ## Flow
 //!
 //! 1. Declare commands with [`console_command`] (a drop-in for `adaliszk-commands`'
-//!    [`command`]) — parameters resolved from the container by type, and `args = TheArgs`
+//!    [`command`]): parameters resolved from the container by type, and `args = TheArgs`
 //!    links the command's flags.
-//! 2. Declare each command's flags as a plain struct with [`console_args`] — the attribute
+//! 2. Declare each command's flags as a plain struct with [`console_args`]; the attribute
 //!    derives `clap::Args`, `Resolvable`, and `Clone`.
 //! 3. Call [`resolve_console`] in `main`, load the config (bound into the carried
 //!    [`Container`] for you), add any services, then [`ResolvedConsoleCommand::resolve`].
